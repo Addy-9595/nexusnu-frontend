@@ -28,5 +28,6 @@
     /* Types */
     "types": ["vite/client"]
   },
+  // Specify the files to be included in the project
   "include": ["src"]
 }
