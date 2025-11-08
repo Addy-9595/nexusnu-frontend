@@ -64,17 +64,31 @@ const PostsPage = () => {
             {posts.map((post) => (
               <div key={post._id} className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
                 <div className="flex items-center mb-4">
-                  <Link to={`/profile/${post.author._id}`} className="flex items-center">
-                    <div className="w-10 h-10 bg-northeastern-red rounded-full flex items-center justify-center text-white font-bold mr-3">
-                      {post.author.name.charAt(0).toUpperCase()}
+                  {post.author ? (
+                    <Link to={`/profile/${post.author._id}`} className="flex items-center">
+                      <div className="w-10 h-10 bg-northeastern-red rounded-full flex items-center justify-center text-white font-bold mr-3">
+                        {post.author.name?.charAt(0).toUpperCase() || '?'}
+                      </div>
+                      <div>
+                        <p className="font-semibold text-gray-800">{post.author.name || 'Unknown User'}</p>
+                        <p className="text-xs text-gray-500">
+                          {new Date(post.createdAt).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </Link>
+                  ) : (
+                    <div className="flex items-center">
+                      <div className="w-10 h-10 bg-gray-400 rounded-full flex items-center justify-center text-white font-bold mr-3">
+                        ?
+                      </div>
+                      <div>
+                        <p className="font-semibold text-gray-800">Unknown User</p>
+                        <p className="text-xs text-gray-500">
+                          {new Date(post.createdAt).toLocaleDateString()}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-semibold text-gray-800">{post.author.name}</p>
-                      <p className="text-xs text-gray-500">
-                        {new Date(post.createdAt).toLocaleDateString()}
-                      </p>
-                    </div>
-                  </Link>
+                  )}
                 </div>
 
                 <Link to={`/posts/${post._id}`}>

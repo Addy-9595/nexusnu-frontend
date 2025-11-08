@@ -90,19 +90,19 @@ const Home = () => {
             ) : (
               <div className="space-y-4">
                 {recentPosts.map((post) => (
-                  <Link
-                    key={post._id}
-                    to={`/posts/${post._id}`}
-                    className="block p-4 border border-gray-200 rounded hover:border-northeastern-red transition"
-                  >
-                    <h3 className="font-semibold text-gray-800 mb-1">
-                      {post.title}
-                    </h3>
-                    <p className="text-sm text-gray-600 mb-2 line-clamp-2">
-                      {post.content}
-                    </p>
-                    <div className="flex items-center text-xs text-gray-500">
-                      <span className="font-medium">{post.author.name}</span>
+  <Link
+    key={post._id}
+    to={`/posts/${post._id}`}
+    className="block p-4 border border-gray-200 rounded hover:border-northeastern-red transition"
+  >
+    <h3 className="font-semibold text-gray-800 mb-1">
+      {post.title}
+    </h3>
+    <p className="text-sm text-gray-600 mb-2 line-clamp-2">
+      {post.content}
+    </p>
+    <div className="flex items-center text-xs text-gray-500">
+      <span className="font-medium">{post.author?.name || 'Unknown'}</span>
                       <span className="mx-2">•</span>
                       <span>{new Date(post.createdAt).toLocaleDateString()}</span>
                       <span className="mx-2">•</span>
@@ -131,19 +131,19 @@ const Home = () => {
             ) : (
               <div className="space-y-4">
                 {upcomingEvents.map((event) => (
-                  <Link
-                    key={event._id}
-                    to={`/events/${event._id}`}
-                    className="block p-4 border border-gray-200 rounded hover:border-northeastern-red transition"
-                  >
-                    <h3 className="font-semibold text-gray-800 mb-1">
-                      {event.title}
-                    </h3>
-                    <p className="text-sm text-gray-600 mb-2 line-clamp-2">
-                      {event.description}
-                    </p>
-                    <div className="flex items-center text-xs text-gray-500">
-                      <span>📍 {event.location}</span>
+  <Link
+    key={event._id}
+    to={`/events/${event._id}`}
+    className="block p-4 border border-gray-200 rounded hover:border-northeastern-red transition"
+  >
+    <h3 className="font-semibold text-gray-800 mb-1">
+      {event.title}
+    </h3>
+    <p className="text-sm text-gray-600 mb-2 line-clamp-2">
+      {event.description}
+    </p>
+    <div className="flex items-center text-xs text-gray-500">
+      <span>📍 {event.location}</span>
                       <span className="mx-2">•</span>
                       <span>📅 {new Date(event.date).toLocaleDateString()}</span>
                       <span className="mx-2">•</span>
