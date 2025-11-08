@@ -2,13 +2,27 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
 const Navbar = () => {
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, logout, loading } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
+
+  if (loading) {
+    return (
+      <nav className="bg-northeastern-red text-white shadow-lg">
+        <div className="container mx-auto px-4">
+          <div className="flex justify-between items-center h-16">
+            <Link to="/" className="text-2xl font-bold">
+              NortheasternConnect
+            </Link>
+          </div>
+        </div>
+      </nav>
+    );
+  }
 
   return (
     <nav className="bg-northeastern-red text-white shadow-lg">
@@ -25,7 +39,7 @@ const Navbar = () => {
               Home
             </Link>
             
-            {isAuthenticated ? (
+            {isAuthenticated && user ? (
               <>
                 <Link to="/posts" className="hover:text-gray-200 transition">
                   Posts
@@ -36,13 +50,13 @@ const Navbar = () => {
                 <Link to="/users" className="hover:text-gray-200 transition">
                   Users
                 </Link>
-                {user?.role === 'admin' && (
+                {user.role === 'admin' && (
                   <Link to="/admin" className="hover:text-gray-200 transition">
                     Admin
                   </Link>
                 )}
                 <Link
-                  to={`/profile/${user?._id}`}
+                  to={`/profile/${user._id}`}
                   className="hover:text-gray-200 transition"
                 >
                   Profile
