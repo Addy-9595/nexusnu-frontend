@@ -1,0 +1,272 @@
+import { useEffect, useState } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
+import { postAPI } from '../../services/api';
+import type { Post } from '../../types';
+
+const PostDetailPage = () => {
+  const { id } = useParams<{ id: string }>();
+  const { user, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const [post, setPost] = useState<Post | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [commentText, setCommentText] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    const fetchPost = async () => {
+      if (!id) return;
+
+      try {
+        const response = await postAPI.getPostById(id);
+        setPost(response.data.post);
+      } catch (error) {
+        console.error('Error fetching post:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPost();
+  }, [id]);
+
+  const handleLike = async () => {
+    if (!isAuthenticated || !id) {
+      navigate('/login');
+      return;
+    }
+
+    try {
+      await postAPI.toggleLike(id);
+      // Refresh post
+      const response = await postAPI.getPostById(id);
+      setPost(response.data.post);
+    } catch (error) {
+      console.error('Error liking post:', error);
+    }
+  };
+
+  const handleComment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!isAuthenticated || !id || !commentText.trim()) {
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      await postAPI.addComment(id, commentText);
+      setCommentText('');
+      // Refresh post
+      const response = await postAPI.getPostById(id);
+      setPost(response.data.post);
+    } catch (error) {
+      console.error('Error adding comment:', error);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!id || !window.confirm('Are you sure you want to delete this post?')) {
+      return;
+    }
+
+    try {
+      await postAPI.deletePost(id);
+      navigate('/posts');
+    } catch (error) {
+      console.error('Error deleting post:', error);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-xl">Loading post...</div>
+      </div>
+    );
+  }
+
+  if (!post) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-xl">Post not found</div>
+      </div>
+    );
+  }
+
+  const isLiked = user && post.likes.includes(user._id);
+  const isAuthor = user && post.author._id === user._id;
+
+  return (
+    <div className="min-h-screen bg-gray-100 py-8">
+      <div className="container mx-auto px-4 max-w-4xl">
+        {/* Back Button */}
+        <Link
+          to="/posts"
+          className="inline-flex items-center text-northeastern-red hover:underline mb-6"
+        >
+          ← Back to Posts
+        </Link>
+
+        {/* Post Content */}
+        <div className="bg-white rounded-lg shadow-md p-8 mb-6">
+          {/* Author Info */}
+          <div className="flex items-center justify-between mb-6">
+            <Link to={`/profile/${post.author._id}`} className="flex items-center">
+              <div className="w-12 h-12 bg-northeastern-red rounded-full flex items-center justify-center text-white font-bold mr-3">
+                {post.author.name.charAt(0).toUpperCase()}
+              </div>
+              <div>
+                <p className="font-semibold text-gray-800">{post.author.name}</p>
+                <p className="text-sm text-gray-500">
+                  {new Date(post.createdAt).toLocaleString()}
+                </p>
+              </div>
+            </Link>
+
+            {isAuthor && (
+              <div className="flex space-x-2">
+                <Link
+                  to={`/posts/${id}/edit`}
+                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition"
+                >
+                  Edit
+                </Link>
+                <button
+                  onClick={handleDelete}
+                  className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
+                >
+                  Delete
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Post Title */}
+          <h1 className="text-3xl font-bold text-gray-800 mb-4">{post.title}</h1>
+
+          {/* Post Image */}
+          {post.imageUrl && (
+            <img
+              src={post.imageUrl}
+              alt={post.title}
+              className="w-full rounded-lg mb-6 max-h-96 object-cover"
+            />
+          )}
+
+          {/* Post Content */}
+          <div className="text-gray-700 mb-6 whitespace-pre-wrap">{post.content}</div>
+
+          {/* Tags */}
+          {post.tags && post.tags.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-6">
+              {post.tags.map((tag, index) => (
+                <span
+                  key={index}
+                  className="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm"
+                >
+                  #{tag}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* Like Button */}
+          <div className="flex items-center space-x-4 pt-4 border-t">
+            <button
+              onClick={handleLike}
+              disabled={!isAuthenticated}
+              className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition ${
+                isLiked
+                  ? 'bg-red-100 text-red-600'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              <span>{isLiked ? '❤️' : '🤍'}</span>
+              <span>{post.likes.length} likes</span>
+            </button>
+            <span className="text-gray-600">💬 {post.comments.length} comments</span>
+          </div>
+        </div>
+
+        {/* Comments Section */}
+        <div className="bg-white rounded-lg shadow-md p-8">
+          <h2 className="text-2xl font-bold text-gray-800 mb-6">
+            Comments ({post.comments.length})
+          </h2>
+
+          {/* Add Comment Form */}
+          {isAuthenticated ? (
+            <form onSubmit={handleComment} className="mb-8">
+              <textarea
+                value={commentText}
+                onChange={(e) => setCommentText(e.target.value)}
+                placeholder="Write a comment..."
+                rows={3}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-northeastern-red mb-2"
+              />
+              <button
+                type="submit"
+                disabled={submitting || !commentText.trim()}
+                className="bg-northeastern-red text-white px-6 py-2 rounded-lg hover:bg-red-700 transition disabled:opacity-50"
+              >
+                {submitting ? 'Posting...' : 'Post Comment'}
+              </button>
+            </form>
+          ) : (
+            <div className="mb-8 p-4 bg-gray-100 rounded-lg text-center">
+              <p className="text-gray-600 mb-2">Please login to comment</p>
+              <Link
+                to="/login"
+                className="text-northeastern-red hover:underline font-semibold"
+              >
+                Login here
+              </Link>
+            </div>
+          )}
+
+          {/* Comments List */}
+          {post.comments.length === 0 ? (
+            <p className="text-gray-500 text-center">
+              No comments yet. Be the first to comment!
+            </p>
+          ) : (
+            <div className="space-y-4">
+              {post.comments.map((comment) => {
+                const commentUser = typeof comment.user === 'object' ? comment.user : null;
+                return (
+                  <div key={comment._id} className="border-l-4 border-northeastern-red pl-4">
+                    <div className="flex items-center mb-2">
+                      {commentUser && (
+                        <Link
+                          to={`/profile/${commentUser._id}`}
+                          className="flex items-center"
+                        >
+                          <div className="w-8 h-8 bg-northeastern-red rounded-full flex items-center justify-center text-white font-bold mr-2 text-sm">
+                            {commentUser.name.charAt(0).toUpperCase()}
+                          </div>
+                          <div>
+                            <p className="font-semibold text-gray-800 text-sm">
+                              {commentUser.name}
+                            </p>
+                          </div>
+                        </Link>
+                      )}
+                      <span className="text-xs text-gray-500 ml-auto">
+                        {new Date(comment.createdAt).toLocaleString()}
+                      </span>
+                    </div>
+                    <p className="text-gray-700">{comment.text}</p>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default PostDetailPage;
