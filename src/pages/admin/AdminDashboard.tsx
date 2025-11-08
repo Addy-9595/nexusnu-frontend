@@ -262,146 +262,154 @@ const AdminDashboard = () => {
 
         {/* Posts Tab */}
         {activeTab === 'posts' && (
-          <div className="bg-white rounded-lg shadow-md overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Title
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Author
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Stats
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Date
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {posts.map((post) => (
-                    <tr key={post._id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4">
-                        <div className="font-medium text-gray-900">{post.title}</div>
-                        <div className="text-sm text-gray-500 line-clamp-1">{post.content}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                        <Link
-                          to={`/profile/${post.author._id}`}
-                          className="hover:text-northeastern-red"
-                        >
-                          {post.author.name}
-                        </Link>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                        <div>{post.likes.length} likes</div>
-                        <div>{post.comments.length} comments</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                        {new Date(post.createdAt).toLocaleDateString()}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm">
-                        <Link
-                          to={`/posts/${post._id}`}
-                          className="text-northeastern-red hover:underline mr-4"
-                        >
-                          View
-                        </Link>
-                        <button
-                          onClick={() => handleDeletePost(post._id)}
-                          className="text-red-600 hover:underline"
-                        >
-                          Delete
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
+  <div className="bg-white rounded-lg shadow-md overflow-hidden">
+    <div className="overflow-x-auto">
+      <table className="w-full">
+        <thead className="bg-gray-50">
+          <tr>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Title
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Author
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Stats
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Date
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Actions
+            </th>
+          </tr>
+        </thead>
+        <tbody className="bg-white divide-y divide-gray-200">
+          {posts.map((post) => (
+            <tr key={post._id} className="hover:bg-gray-50">
+              <td className="px-6 py-4">
+                <div className="font-medium text-gray-900">{post.title}</div>
+                <div className="text-sm text-gray-500 line-clamp-1">{post.content}</div>
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                {post.author ? (
+                  <Link
+                    to={`/profile/${post.author._id}`}
+                    className="hover:text-northeastern-red"
+                  >
+                    {post.author.name || 'Unknown User'}
+                  </Link>
+                ) : (
+                  <span className="text-gray-400">Unknown User</span>
+                )}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                <div>{post.likes.length} likes</div>
+                <div>{post.comments.length} comments</div>
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                {new Date(post.createdAt).toLocaleDateString()}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm">
+                <Link
+                  to={`/posts/${post._id}`}
+                  className="text-northeastern-red hover:underline mr-4"
+                >
+                  View
+                </Link>
+                <button
+                  onClick={() => handleDeletePost(post._id)}
+                  className="text-red-600 hover:underline"
+                >
+                  Delete
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+)}
 
         {/* Events Tab */}
-        {activeTab === 'events' && (
-          <div className="bg-white rounded-lg shadow-md overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Event
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Organizer
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Location
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Date
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Participants
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {events.map((event) => (
-                    <tr key={event._id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4">
-                        <div className="font-medium text-gray-900">{event.title}</div>
-                        <div className="text-sm text-gray-500 line-clamp-1">
-                          {event.description}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                        <Link
-                          to={`/profile/${event.organizer._id}`}
-                          className="hover:text-northeastern-red"
-                        >
-                          {event.organizer.name}
-                        </Link>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                        {event.location}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                        {new Date(event.date).toLocaleDateString()}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                        {event.participants.length}
-                        {event.maxParticipants && ` / ${event.maxParticipants}`}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm">
-                        <Link
-                          to={`/events/${event._id}`}
-                          className="text-northeastern-red hover:underline mr-4"
-                        >
-                          View
-                        </Link>
-                        <button
-                          onClick={() => handleDeleteEvent(event._id)}
-                          className="text-red-600 hover:underline"
-                        >
-                          Delete
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+       {activeTab === 'events' && (
+  <div className="bg-white rounded-lg shadow-md overflow-hidden">
+    <div className="overflow-x-auto">
+      <table className="w-full">
+        <thead className="bg-gray-50">
+          <tr>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Event
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Organizer
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Location
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Date
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Participants
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Actions
+            </th>
+          </tr>
+        </thead>
+        <tbody className="bg-white divide-y divide-gray-200">
+          {events.map((event) => (
+            <tr key={event._id} className="hover:bg-gray-50">
+              <td className="px-6 py-4">
+                <div className="font-medium text-gray-900">{event.title}</div>
+                <div className="text-sm text-gray-500 line-clamp-1">
+                  {event.description}
+                </div>
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                {event.organizer ? (
+                  <Link
+                    to={`/profile/${event.organizer._id}`}
+                    className="hover:text-northeastern-red"
+                  >
+                    {event.organizer.name || 'Unknown User'}
+                  </Link>
+                ) : (
+                  <span className="text-gray-400">Unknown User</span>
+                )}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                {event.location}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                {new Date(event.date).toLocaleDateString()}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                {event.participants.length}
+                {event.maxParticipants && ` / ${event.maxParticipants}`}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm">
+                <Link
+                  to={`/events/${event._id}`}
+                  className="text-northeastern-red hover:underline mr-4"
+                >
+                  View
+                </Link>
+                <button
+                  onClick={() => handleDeleteEvent(event._id)}
+                  className="text-red-600 hover:underline"
+                >
+                  Delete
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
         )}
       </div>
     </div>
