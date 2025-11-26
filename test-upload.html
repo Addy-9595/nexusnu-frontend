@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image Upload Test</title>
+</head>
+<body>
+    <h1>Test Image Upload</h1>
+    
+    <h3>1. Login First</h3>
+    <input type="email" id="email" placeholder="Email" value="dalvi.at@northeastern.edu">
+    <input type="password" id="password" placeholder="Password" value="your_password">
+    <button onclick="login()">Login</button>
+    <p id="token"></p>
+    
+    <hr>
+    
+    <h3>2. Upload Images</h3>
+    <input type="file" id="files" multiple accept="image/*">
+    <button onclick="uploadImages()">Upload</button>
+    <div id="result"></div>
+    
+    <script>
+        let authToken = '';
+        
+        async function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            const res = await fetch('http://localhost:5000/api/auth/login', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({email, password})
+            });
+            
+            const data = await res.json();
+            authToken = data.token;
+            document.getElementById('token').textContent = 'Token: ' + authToken.substring(0, 20) + '...';
+        }
+        
+        async function uploadImages() {
+            const files = document.getElementById('files').files;
+            const formData = new FormData();
+            
+            for (let file of files) {
+                formData.append('images', file);
+            }
+            
+            const res = await fetch('http://localhost:5000/api/posts/upload-images', {
+                method: 'POST',
+                headers: {'Authorization': 'Bearer ' + authToken},
+                body: formData
+            });
+            
+            const data = await res.json();
+            
+            let html = '<h4>Uploaded Images:</h4>';
+            data.images.forEach(url => {
+                html += `<img src="http://localhost:5000${url}" width="200"><br>`;
+                html += `<input value="http://localhost:5000${url}" style="width:400px"><br><br>`;
+            });
+            
+            document.getElementById('result').innerHTML = html;
+        }
+    </script>
+</body>
+</html>

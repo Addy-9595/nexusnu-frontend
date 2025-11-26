@@ -36,18 +36,45 @@ const Home = () => {
   const [recentPosts, setRecentPosts] = useState<Post[]>([]);
   const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [postsRes, eventsRes] = await Promise.all([
-          api.get('/posts?limit=3'),
-          api.get('/events?limit=3'),
-        ]);
-        setRecentPosts(postsRes.data);
-        setUpcomingEvents(eventsRes.data);
-      } catch (error) {
+        setLoading(true);
+        setError(null);
+
+        // Fetch posts
+        const postsRes = await api.get('/posts?limit=3');
+        console.log('Posts Response:', postsRes.data); // Debug log
+       
+        // Check if response.data is an array or if data is nested
+        const postsData = Array.isArray(postsRes.data)
+          ? postsRes.data
+          : Array.isArray(postsRes.data.posts)
+          ? postsRes.data.posts
+          : [];
+       
+        setRecentPosts(postsData);
+
+        // Fetch events
+        const eventsRes = await api.get('/events?limit=3');
+        console.log('Events Response:', eventsRes.data); // Debug log
+       
+        // Check if response.data is an array or if data is nested
+        const eventsData = Array.isArray(eventsRes.data)
+          ? eventsRes.data
+          : Array.isArray(eventsRes.data.events)
+          ? eventsRes.data.events
+          : [];
+       
+        setUpcomingEvents(eventsData);
+      } catch (error: any) {
         console.error('Error fetching data:', error);
+        setError(error.response?.data?.message || 'Failed to load content');
+        // Set empty arrays on error to prevent crashes
+        setRecentPosts([]);
+        setUpcomingEvents([]);
       } finally {
         setLoading(false);
       }
@@ -130,6 +157,17 @@ const Home = () => {
             <div className="inline-block w-12 h-12 sm:w-16 sm:h-16 border-4 border-northeastern-red border-t-transparent rounded-full animate-spin"></div>
             <p className="mt-4 text-sm sm:text-base text-northeastern-gray-600 font-semibold">Loading amazing content...</p>
           </div>
+        ) : error ? (
+          <div className="text-center py-20">
+            <div className="text-6xl mb-4">⚠️</div>
+            <p className="text-northeastern-red font-semibold text-lg mb-4">{error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="btn-primary"
+            >
+              Retry
+            </button>
+          </div>
         ) : (
           <div className="grid lg:grid-cols-2 gap-8 sm:gap-10 lg:gap-12">
             {/* Recent Posts */}
@@ -162,14 +200,14 @@ const Home = () => {
                     >
                       <div className="flex items-start space-x-3 sm:space-x-4 mb-4">
                         <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-northeastern-red to-northeastern-red-dark rounded-xl flex items-center justify-center text-white font-black text-base sm:text-lg flex-shrink-0">
-                          {post.author.name?.charAt(0).toUpperCase() || '?'}
+                          {post.author?.name?.charAt(0).toUpperCase() || '?'}
                         </div>
                         <div className="flex-1 min-w-0">
                           <h3 className="font-bold text-northeastern-gray-900 text-base sm:text-lg lg:text-xl mb-1 group-hover:text-northeastern-red transition-colors line-clamp-2">
                             {post.title}
                           </h3>
                           <p className="text-xs sm:text-sm text-northeastern-gray-600 font-medium">
-                            by {post.author.name} • {new Date(post.createdAt).toLocaleDateString()}
+                            by {post.author?.name || 'Unknown'} • {new Date(post.createdAt).toLocaleDateString()}
                           </p>
                         </div>
                       </div>
@@ -177,8 +215,8 @@ const Home = () => {
                         {post.content}
                       </p>
                       <div className="flex items-center space-x-4 sm:space-x-6 text-xs sm:text-sm text-northeastern-gray-500 font-semibold">
-                        <span>❤️ {post.likes.length}</span>
-                        <span>💬 {post.comments.length}</span>
+                        <span>❤️ {post.likes?.length || 0}</span>
+                        <span>💬 {post.comments?.length || 0}</span>
                       </div>
                     </Link>
                   ))}
@@ -236,8 +274,8 @@ const Home = () => {
                         {event.description}
                       </p>
                       <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-xs sm:text-sm text-northeastern-gray-500 font-semibold">
-                        <span>👥 {event.attendees.length} attending</span>
-                        <span className="truncate">by {event.organizer.name}</span>
+                        <span>👥 {event.attendees?.length || 0} attending</span>
+                        <span className="truncate">by {event.organizer?.name || 'Unknown'}</span>
                       </div>
                     </Link>
                   ))}
@@ -270,5 +308,4 @@ const Home = () => {
     </div>
   );
 };
-
 export default Home;

@@ -9,6 +9,7 @@ interface AuthContextType {
   login: (credentials: LoginCredentials) => Promise<void>;
   register: (data: RegisterData) => Promise<void>;
   logout: () => void;
+  refreshUser: () => Promise<void>; // Added refreshUser function
   isAuthenticated: boolean;
 }
 
@@ -62,6 +63,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.removeItem('token');
   };
 
+  // New function to refresh user data
+  const refreshUser = async () => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const response = await authAPI.getCurrentUser();
+        setUser(response.data.user);
+      } catch (error) {
+        console.error('Error refreshing user:', error);
+        localStorage.removeItem('token');
+        setUser(null);
+      }
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -70,6 +86,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         login,
         register,
         logout,
+        refreshUser, // Added to provider
         isAuthenticated: !!user,
       }}
     >

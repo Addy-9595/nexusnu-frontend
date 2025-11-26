@@ -11,7 +11,9 @@ const PostDetailPage = () => {
   const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
   const [commentText, setCommentText] = useState('');
+  const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -54,9 +56,9 @@ const PostDetailPage = () => {
 
     setSubmitting(true);
     try {
-      await postAPI.addComment(id, commentText);
+      await postAPI.addComment(id, commentText, replyingTo || undefined);
       setCommentText('');
-      // Refresh post
+      setReplyingTo(null);
       const response = await postAPI.getPostById(id);
       setPost(response.data.post);
     } catch (error) {
@@ -64,6 +66,26 @@ const PostDetailPage = () => {
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const handleDeleteComment = async (commentId: string) => {
+    if (!window.confirm('Delete this comment?')) return;
+    
+    try {
+      await postAPI.deleteComment(id!, commentId);
+      const response = await postAPI.getPostById(id!);
+      setPost(response.data.post);
+    } catch (error) {
+      console.error('Error deleting comment:', error);
+    }
+  };
+
+  const canDeleteComment = (comment: any) => {
+    if (!user) return false;
+    if (user.role === 'admin') return true;
+    if (post?.author._id === user._id) return true;
+    const commentUser = typeof comment.user === 'object' ? comment.user : null;
+    return commentUser?._id === user._id;
   };
 
   const handleDelete = async () => {
@@ -146,13 +168,42 @@ const PostDetailPage = () => {
           {/* Post Title */}
           <h1 className="text-3xl font-bold text-gray-800 mb-4">{post.title}</h1>
 
-          {/* Post Image */}
+           {/* Post Images */}
           {post.imageUrl && (
             <img
               src={post.imageUrl}
               alt={post.title}
               className="w-full rounded-lg mb-6 max-h-96 object-cover"
             />
+          )}
+          
+          {post.images && post.images.length > 0 && (
+            <div className="relative w-full h-96 bg-gray-100 rounded-lg mb-6 overflow-hidden">
+              <img
+                src={`http://localhost:5000${post.images[currentImageIndex]}`}
+                alt={`${post.title} ${currentImageIndex + 1}`}
+                className="w-full h-full object-contain"
+              />
+              {post.images.length > 1 && (
+                <>
+                  <button
+                    onClick={() => setCurrentImageIndex((currentImageIndex - 1 + post.images.length) % post.images.length)}
+                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70"
+                  >
+                    ←
+                  </button>
+                  <button
+                    onClick={() => setCurrentImageIndex((currentImageIndex + 1) % post.images.length)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70"
+                  >
+                    →
+                  </button>
+                  <div className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/60 text-white px-3 py-1 rounded-full text-sm">
+                    {currentImageIndex + 1} / {post.images.length}
+                  </div>
+                </>
+              )}
+            </div>
           )}
 
           {/* Post Content */}
@@ -199,10 +250,15 @@ const PostDetailPage = () => {
           {/* Add Comment Form */}
           {isAuthenticated ? (
             <form onSubmit={handleComment} className="mb-8">
+              {replyingTo && (
+                <div className="mb-2 text-sm text-gray-600">
+                  Replying to comment... <button type="button" onClick={() => setReplyingTo(null)} className="text-northeastern-red hover:underline">Cancel</button>
+                </div>
+              )}
               <textarea
                 value={commentText}
                 onChange={(e) => setCommentText(e.target.value)}
-                placeholder="Write a comment..."
+                placeholder={replyingTo ? "Write a reply..." : "Write a comment..."}
                 rows={3}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-northeastern-red mb-2"
               />
@@ -211,7 +267,7 @@ const PostDetailPage = () => {
                 disabled={submitting || !commentText.trim()}
                 className="bg-northeastern-red text-white px-6 py-2 rounded-lg hover:bg-red-700 transition disabled:opacity-50"
               >
-                {submitting ? 'Posting...' : 'Post Comment'}
+                {submitting ? 'Posting...' : replyingTo ? 'Post Reply' : 'Post Comment'}
               </button>
             </form>
           ) : (
@@ -233,31 +289,66 @@ const PostDetailPage = () => {
             </p>
           ) : (
             <div className="space-y-4">
-              {post.comments.map((comment) => {
+              {post.comments.filter(c => !c.parentCommentId).map((comment) => {
                 const commentUser = typeof comment.user === 'object' ? comment.user : null;
+                const replies = post.comments.filter(c => c.parentCommentId === comment._id);
                 return (
-                  <div key={comment._id} className="border-l-4 border-northeastern-red pl-4">
-                    <div className="flex items-center mb-2">
-                      {commentUser && (
-                        <Link
-                          to={`/profile/${commentUser._id}`}
-                          className="flex items-center"
-                        >
-                          <div className="w-8 h-8 bg-northeastern-red rounded-full flex items-center justify-center text-white font-bold mr-2 text-sm">
-                            {commentUser.name.charAt(0).toUpperCase()}
-                          </div>
-                          <div>
-                            <p className="font-semibold text-gray-800 text-sm">
-                              {commentUser.name}
-                            </p>
-                          </div>
-                        </Link>
-                      )}
-                      <span className="text-xs text-gray-500 ml-auto">
-                        {new Date(comment.createdAt).toLocaleString()}
-                      </span>
+                  <div key={comment._id}>
+                    <div className="border-l-4 border-northeastern-red pl-4">
+                      <div className="flex items-center mb-2">
+                        {commentUser && (
+                          <Link to={`/profile/${commentUser._id}`} className="flex items-center">
+                            <div className="w-8 h-8 bg-northeastern-red rounded-full flex items-center justify-center text-white font-bold mr-2 text-sm">
+                              {commentUser.name.charAt(0).toUpperCase()}
+                            </div>
+                            <p className="font-semibold text-gray-800 text-sm">{commentUser.name}</p>
+                          </Link>
+                        )}
+                        <span className="text-xs text-gray-500 ml-auto">{new Date(comment.createdAt).toLocaleString()}</span>
+                      </div>
+                      <p className="text-gray-700">{comment.text}</p>
+                      <div className="mt-2 flex gap-2">
+                        {isAuthenticated && (
+                          <button onClick={() => setReplyingTo(comment._id!)} className="text-xs text-northeastern-red hover:underline">
+                            Reply
+                          </button>
+                        )}
+                        {canDeleteComment(comment) && (
+                          <button onClick={() => handleDeleteComment(comment._id!)} className="text-xs text-red-600 hover:underline">
+                            Delete
+                          </button>
+                        )}
+                      </div>
                     </div>
-                    <p className="text-gray-700">{comment.text}</p>
+                     {replies.length > 0 && (
+                      <div className="ml-8 mt-3 space-y-3">
+                        {replies.map(reply => {
+                          const replyUser = typeof reply.user === 'object' ? reply.user : null;
+                          return (
+                            <div key={reply._id} className="bg-gray-50 border-l-4 border-blue-400 pl-4 py-3 rounded-r">
+                              <div className="flex items-center mb-2">
+                                <span className="text-xs text-blue-600 font-semibold mr-2">↳ Reply</span>
+                                {replyUser && (
+                                  <Link to={`/profile/${replyUser._id}`} className="flex items-center">
+                                    <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold mr-2 text-xs">
+                                      {replyUser.name.charAt(0).toUpperCase()}
+                                    </div>
+                                    <p className="font-semibold text-gray-800 text-xs">{replyUser.name}</p>
+                                  </Link>
+                                )}
+                                <span className="text-xs text-gray-500 ml-auto">{new Date(reply.createdAt).toLocaleString()}</span>
+                              </div>
+                              <p className="text-gray-700 text-sm ml-6">{reply.text}</p>
+                              {canDeleteComment(reply) && (
+                                <button onClick={() => handleDeleteComment(reply._id!)} className="text-xs text-red-600 hover:underline mt-2 ml-6">
+                                  Delete
+                                </button>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
                 );
               })}

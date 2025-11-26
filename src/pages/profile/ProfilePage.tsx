@@ -13,6 +13,7 @@ const ProfilePage = () => {
   const [loading, setLoading] = useState(true);
   const [isFollowing, setIsFollowing] = useState(false);
 
+  const BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace('/api', '');
   const isOwnProfile = currentUser?._id === id;
 
   useEffect(() => {
@@ -86,9 +87,18 @@ const ProfilePage = () => {
         <div className="bg-white rounded-lg shadow-md p-8 mb-8">
           <div className="flex items-start justify-between">
             <div className="flex items-center space-x-6">
-              <div className="w-24 h-24 bg-northeastern-red rounded-full flex items-center justify-center text-white text-4xl font-bold">
-                {user.name.charAt(0).toUpperCase()}
+              {/* Profile Picture with Image Support */}
+              <div className="w-24 h-24 bg-northeastern-red rounded-full flex items-center justify-center text-white text-4xl font-bold overflow-hidden">
+                {user.profilePicture ? (
+              <img
+                src={user.profilePicture.startsWith('http') ? user.profilePicture : `${BASE_URL}${user.profilePicture}`}
+                alt={user.name}
+                className="w-full h-full object-cover"
+              />) : (
+              user.name.charAt(0).toUpperCase()
+              )}
               </div>
+              
               <div>
                 <h1 className="text-3xl font-bold text-gray-800 mb-2">
                   {user.name}
@@ -140,6 +150,24 @@ const ProfilePage = () => {
             <p className="mt-6 text-gray-700">{user.bio}</p>
           )}
 
+          {/* Skills Section */}
+          {user.skills && user.skills.length > 0 && (
+            <div className="mt-6">
+              <h3 className="text-sm font-semibold text-gray-700 mb-2">Skills</h3>
+              <div className="flex flex-wrap gap-2">
+                {user.skills.map((skill, index) => (
+                  <span
+                    key={index}
+                    className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium"
+                  >
+                    {skill}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Stats Section */}
           <div className="flex space-x-8 mt-6 text-sm">
             <div>
               <span className="font-bold text-lg">{user.followers.length}</span>

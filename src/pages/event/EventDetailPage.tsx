@@ -10,6 +10,7 @@ const EventDetailPage = () => {
   const navigate = useNavigate();
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   useEffect(() => {
     const fetchEvent = async () => {
@@ -103,6 +104,38 @@ const EventDetailPage = () => {
               className="w-full h-64 object-cover"
             />
           )}
+          
+          {event.images && event.images.length > 0 && (
+            <div className="relative w-full aspect-video bg-gray-900 overflow-hidden">
+              <img
+                src={`http://localhost:5000${event.images[currentImageIndex]}`}
+                alt={`${event.title} ${currentImageIndex + 1}`}
+                className="w-full h-full object-contain"
+                loading="lazy"
+              />
+
+              {event.images.length > 1 && (
+                <>
+                  <button
+                    onClick={() => setCurrentImageIndex((currentImageIndex - 1 + event.images!.length) % event.images!.length)}
+                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/80 text-white w-10 h-10 rounded-full flex items-center justify-center text-2xl transition"
+                  >
+                    ‹
+                  </button>
+                  <button
+                    onClick={() => setCurrentImageIndex((currentImageIndex + 1) % event.images!.length)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/80 text-white w-10 h-10 rounded-full flex items-center justify-center text-2xl transition"
+                  >
+                    ›
+                  </button>
+                  <div className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/60 text-white px-3 py-1 rounded-full text-sm">
+                    {currentImageIndex + 1} / {event.images!.length}
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+
 
           <div className="p-8">
             {/* Header */}
