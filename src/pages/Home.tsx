@@ -98,7 +98,7 @@ const Home = () => {
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-black leading-tight px-4">
               Welcome to <br className="hidden sm:block"/>
               <span className="inline-block mt-2 bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-100 to-white">
-                NortheasternConnect
+                NexusNU
               </span>
             </h1>
             <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-200 max-w-2xl mx-auto font-medium leading-relaxed px-4">

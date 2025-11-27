@@ -178,29 +178,32 @@ const PostDetailPage = () => {
           )}
           
           {post.images && post.images.length > 0 && (
-            <div className="relative w-full h-96 bg-gray-100 rounded-lg mb-6 overflow-hidden">
+            <div className="relative w-full aspect-video bg-gray-900 rounded-lg mb-6 overflow-hidden">
               <img
                 src={`http://localhost:5000${post.images[currentImageIndex]}`}
                 alt={`${post.title} ${currentImageIndex + 1}`}
                 className="w-full h-full object-contain"
+                loading="lazy"
               />
+
               {post.images.length > 1 && (
                 <>
                   <button
-                    onClick={() => setCurrentImageIndex((currentImageIndex - 1 + post.images.length) % post.images.length)}
-                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70"
+                    onClick={() => setCurrentImageIndex((currentImageIndex - 1 + post.images!.length) % post.images!.length)}
+                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/80 text-white w-10 h-10 rounded-full flex items-center justify-center text-2xl transition"
                   >
-                    ←
+                    ‹
                   </button>
                   <button
-                    onClick={() => setCurrentImageIndex((currentImageIndex + 1) % post.images.length)}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70"
+                    onClick={() => setCurrentImageIndex((currentImageIndex + 1) % post.images!.length)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/80 text-white w-10 h-10 rounded-full flex items-center justify-center text-2xl transition"
                   >
-                    →
+                    ›
                   </button>
                   <div className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/60 text-white px-3 py-1 rounded-full text-sm">
-                    {currentImageIndex + 1} / {post.images.length}
+                    {currentImageIndex + 1} / {post.images!.length}
                   </div>
+
                 </>
               )}
             </div>
