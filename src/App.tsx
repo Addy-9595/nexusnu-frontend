@@ -8,6 +8,7 @@ import Home from './pages/Home';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import ProfilePage from './pages/profile/ProfilePage';
+import EditProfilePage from './pages/profile/EditProfilePage'; // Import the new page
 import PostsPage from './pages/post/PostsPage';
 import CreatePostPage from './pages/post/CreatePostPage';
 import PostDetailPage from './pages/post/PostDetailPage';
@@ -80,6 +81,16 @@ function AppContent() {
               </ProtectedRoute>
             }
           />
+
+ {/* Edit Post Route */}
+  <Route
+  path="/posts/:id/edit"
+  element={
+    <ProtectedRoute>
+      <CreatePostPage />
+    </ProtectedRoute>
+  }
+/>
           
           {/* Events Routes */}
           <Route path="/events" element={<EventsPage />} />
@@ -92,8 +103,26 @@ function AppContent() {
               </ProtectedRoute>
             }
           />
+
+          {/* Edit Event Route */}
+          <Route
+  path="/events/:id/edit"
+  element={
+    <ProtectedRoute>
+      <CreateEventPage />
+    </ProtectedRoute>
+  }
+/>
           
-          {/* Profile Routes */}
+          {/* Profile Routes - IMPORTANT: /profile/edit must come BEFORE /profile/:id */}
+          <Route
+            path="/profile/edit"
+            element={
+              <ProtectedRoute>
+                <EditProfilePage />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/profile/:id" element={<ProfilePage />} />
           
           {/* Admin Routes */}

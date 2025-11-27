@@ -16,6 +16,7 @@ export interface User {
   major?: string;
   department?: string;
   profilePicture?: string;
+  skills?: string[];  // ⭐ ADDED: Skills array
   followers: string[];
   following: string[];
   isVerified: boolean;
@@ -50,6 +51,7 @@ export interface Comment {
   _id?: string;
   user: User | string;
   text: string;
+  parentCommentId?: string;
   createdAt: string;
 }
 
@@ -62,6 +64,7 @@ export interface Post {
   comments: Comment[];
   tags?: string[];
   imageUrl?: string;
+  images?: string[];
   createdAt: string;
   updatedAt: string;
 }
@@ -71,6 +74,7 @@ export interface CreatePostData {
   content: string;
   tags?: string[];
   imageUrl?: string;
+  images?: string[];
 }
 
 // Event types
@@ -85,6 +89,7 @@ export interface Event {
   maxParticipants?: number;
   tags?: string[];
   imageUrl?: string;
+  images?: string[];
   createdAt: string;
   updatedAt: string;
 }
@@ -97,6 +102,7 @@ export interface CreateEventData {
   maxParticipants?: number;
   tags?: string[];
   imageUrl?: string;
+  images?: string[];
 }
 
 // API Response types

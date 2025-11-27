@@ -1,9 +1,11 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { eventAPI } from '../../services/api';
 
 const CreateEventPage = () => {
-  const [formData, setFormData] = useState({
+  const { id } = useParams();
+  const navigate = useNavigate();
+   const [formData, setFormData] = useState({
     title: '',
     description: '',
     date: '',
@@ -12,16 +14,49 @@ const CreateEventPage = () => {
     tags: '',
     imageUrl: '',
   });
+  const [selectedImages, setSelectedImages] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const isEditing = !!id;
 
-  const navigate = useNavigate();
+  useEffect(() => {
+    if (isEditing) {
+      const fetchEvent = async () => {
+        try {
+          const response = await eventAPI.getEventById(id);
+          const event = response.data.event;
+          const localDate = new Date(event.date).toISOString().slice(0, 16);
+          setFormData({
+            title: event.title,
+            description: event.description,
+            date: localDate,
+            location: event.location,
+            maxParticipants: event.maxParticipants?.toString() || '',
+            tags: event.tags?.join(', ') || '',
+            imageUrl: event.imageUrl || '',
+          });
+        } catch (err: any) {
+          setError('Failed to load event');
+        }
+      };
+      fetchEvent();
+    }
+  }, [id, isEditing]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    setSelectedImages(files);
+    
+    const previews = files.map(file => URL.createObjectURL(file));
+    setImagePreviews(previews);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -35,7 +70,15 @@ const CreateEventPage = () => {
         .map((tag) => tag.trim())
         .filter((tag) => tag);
 
-      await eventAPI.createEvent({
+      let imageUrls: string[] = [];
+      
+      // Upload images first if selected
+      if (selectedImages.length > 0) {
+        const uploadRes = await eventAPI.uploadEventImages(selectedImages);
+        imageUrls = uploadRes.data.images;
+      }
+
+      const data = {
         title: formData.title,
         description: formData.description,
         date: formData.date,
@@ -43,20 +86,27 @@ const CreateEventPage = () => {
         maxParticipants: formData.maxParticipants ? parseInt(formData.maxParticipants) : undefined,
         tags: tagsArray,
         imageUrl: formData.imageUrl,
-      });
+        images: imageUrls,
+      };
+
+      if (isEditing) {
+        await eventAPI.updateEvent(id, data);
+      } else {
+        await eventAPI.createEvent(data);
+      }
 
       navigate('/events');
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to create event');
+      setError(err.response?.data?.message || `Failed to ${isEditing ? 'update' : 'create'} event`);
     } finally {
       setLoading(false);
     }
   };
-
+  
   return (
     <div className="min-h-screen bg-gray-100 py-8">
       <div className="container mx-auto px-4 max-w-2xl">
-        <h1 className="text-3xl font-bold text-gray-800 mb-8">Create New Event</h1>
+        <h1 className="text-3xl font-bold text-gray-800 mb-8">{isEditing ? 'Edit' : 'Create New'} Event</h1>
 
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
@@ -161,7 +211,7 @@ const CreateEventPage = () => {
             />
           </div>
 
-          <div>
+           <div>
             <label htmlFor="imageUrl" className="block text-sm font-medium text-gray-700 mb-1">
               Event Image URL (optional)
             </label>
@@ -176,13 +226,34 @@ const CreateEventPage = () => {
             />
           </div>
 
+          <div>
+            <label htmlFor="images" className="block text-sm font-medium text-gray-700 mb-1">
+              Upload Multiple Event Images (optional)
+            </label>
+            <input
+              type="file"
+              id="images"
+              multiple
+              accept="image/*"
+              onChange={handleImageChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+            />
+            {imagePreviews.length > 0 && (
+              <div className="mt-2 grid grid-cols-3 gap-2">
+                {imagePreviews.map((preview, idx) => (
+                  <img key={idx} src={preview} alt={`Preview ${idx}`} className="w-full h-24 object-cover rounded" />
+                ))}
+              </div>
+            )}
+          </div>
+
           <div className="flex space-x-4 pt-4">
             <button
               type="submit"
               disabled={loading}
               className="flex-1 bg-northeastern-red text-white py-2 px-4 rounded-md hover:bg-red-700 transition disabled:opacity-50"
             >
-              {loading ? 'Creating...' : 'Create Event'}
+              {loading ? `${isEditing ? 'Updating' : 'Creating'}...` : `${isEditing ? 'Update' : 'Create'} Event`}
             </button>
             <button
               type="button"

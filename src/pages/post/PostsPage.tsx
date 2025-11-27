@@ -8,11 +8,14 @@ const PostsPage = () => {
   const { isAuthenticated } = useAuth();
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
+  const [imageIndexes, setImageIndexes] = useState<{[key: string]: number}>({});
 
-  useEffect(() => {
+   useEffect(() => {
     const fetchPosts = async () => {
       try {
         const response = await postAPI.getAllPosts();
+        console.log('📥 Fetched posts:', response.data.posts);
+        console.log('🖼️ First post images:', response.data.posts[0]?.images);
         setPosts(response.data.posts);
       } catch (error) {
         console.error('Error fetching posts:', error);
@@ -62,7 +65,9 @@ const PostsPage = () => {
         ) : (
           <div className="space-y-6">
             {posts.map((post) => (
-              <div key={post._id} className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
+              <div key={post._id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
+                
+                <div className="p-6">
                 <div className="flex items-center mb-4">
                   {post.author ? (
                     <Link to={`/profile/${post.author._id}`} className="flex items-center">
@@ -98,6 +103,50 @@ const PostsPage = () => {
                   <p className="text-gray-600 mb-4 line-clamp-3">{post.content}</p>
                 </Link>
 
+                {post.images && post.images.length > 0 && (
+                  <div className="relative w-full aspect-video bg-gray-900 rounded-lg overflow-hidden mb-4">
+                    <img
+                      src={`http://localhost:5000${post.images[imageIndexes[post._id] || 0]}`}
+                      alt={post.title}
+                      className="w-full h-full object-contain"
+                      loading="lazy"
+                    />
+                    {post.images.length > 1 && (
+                      <>
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            const len = post.images?.length || 0;
+                            setImageIndexes(prev => ({
+                              ...prev,
+                              [post._id]: ((prev[post._id] || 0) - 1 + len) % len
+                            }));
+                          }}
+                          className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/80 text-white w-8 h-8 rounded-full flex items-center justify-center transition"
+                        >
+                          ‹
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            const len = post.images?.length || 0;
+                            setImageIndexes(prev => ({
+                              ...prev,
+                              [post._id]: ((prev[post._id] || 0) + 1) % len
+                            }));
+                          }}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/80 text-white w-8 h-8 rounded-full flex items-center justify-center transition"
+                        >
+                          ›
+                        </button>
+                        <span className="absolute bottom-2 right-2 bg-black/70 text-white px-3 py-1 rounded-full text-xs font-semibold">
+                          {(imageIndexes[post._id] || 0) + 1} / {post.images?.length || 0}
+                        </span>
+                      </>
+                    )}
+                  </div>
+                )}
+
                 {post.tags && post.tags.length > 0 && (
                   <div className="flex flex-wrap gap-2 mb-4">
                     {post.tags.map((tag, index) => (
@@ -124,6 +173,7 @@ const PostsPage = () => {
                   >
                     View Details
                   </Link>
+                </div>
                 </div>
               </div>
             ))}
