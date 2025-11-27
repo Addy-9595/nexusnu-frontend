@@ -27,7 +27,7 @@ const Navbar = () => {
                 <span className="text-2xl lg:text-3xl font-black text-northeastern-red" style={{ fontFamily: 'Georgia, serif' }}>N</span>
               </div>
               <span className="text-lg lg:text-2xl font-black tracking-tight">
-                NortheasternConnect
+                NexusNU
               </span>
             </div>
           </div>
@@ -46,7 +46,7 @@ const Navbar = () => {
               <span className="text-2xl lg:text-3xl font-black text-northeastern-red" style={{ fontFamily: 'Georgia, serif' }}>N</span>
             </div>
             <span className="text-lg lg:text-2xl font-black tracking-tight group-hover:text-gray-100 transition-colors hidden sm:block">
-              NortheasternConnect
+              NexusNU
             </span>
             <span className="text-lg lg:text-2xl font-black tracking-tight group-hover:text-gray-100 transition-colors sm:hidden">
               NEU

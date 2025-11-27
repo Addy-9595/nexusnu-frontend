@@ -9,7 +9,7 @@ const Footer = () => {
               <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-lg">
                 <span className="text-2xl font-black text-northeastern-red" style={{ fontFamily: 'Georgia, serif' }}>N</span>
               </div>
-              <span className="text-xl font-black">NortheasternConnect</span>
+              <span className="text-xl font-black">NexusNU</span>
             </div>
             <p className="text-northeastern-gray-300 text-sm leading-relaxed">
               Connecting students, professors, and alumni at Northeastern University
@@ -52,7 +52,7 @@ const Footer = () => {
         <div className="border-t border-white/10 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <p className="text-northeastern-gray-400 text-sm text-center md:text-left">
-              &copy; 2025 NortheasternConnect. All rights reserved.
+              &copy; 2025 NexusNU. All rights reserved.
             </p>
             <div className="flex flex-wrap justify-center md:justify-end space-x-4 lg:space-x-6 text-sm text-northeastern-gray-400">
               <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
