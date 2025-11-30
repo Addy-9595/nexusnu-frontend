@@ -5,11 +5,10 @@ import { postAPI } from '../../services/api';
 const CreatePostPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-    const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState({
     title: '',
     content: '',
     tags: '',
-    imageUrl: '',
   });
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [error, setError] = useState('');
@@ -26,7 +25,6 @@ const CreatePostPage = () => {
             title: post.title,
             content: post.content,
             tags: post.tags?.join(', ') || '',
-            imageUrl: post.imageUrl || '',
           });
         } catch (err: any) {
           setError('Failed to load post');
@@ -43,12 +41,7 @@ const CreatePostPage = () => {
     });
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    setSelectedFiles(files);
-  };
-
-    const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
@@ -81,7 +74,6 @@ const CreatePostPage = () => {
       setLoading(false);
     }
   };
-
 
   return (
     <div className="min-h-screen bg-gray-100 py-8">
@@ -155,7 +147,6 @@ const CreatePostPage = () => {
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-northeastern-red"
             />
           </div>
-
 
           <div className="flex space-x-4 pt-4">
             <button
