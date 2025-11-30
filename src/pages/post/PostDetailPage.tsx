@@ -168,19 +168,11 @@ const PostDetailPage = () => {
           {/* Post Title */}
           <h1 className="text-3xl font-bold text-gray-800 mb-4">{post.title}</h1>
 
-           {/* Post Images */}
-          {post.imageUrl && (
-            <img
-              src={post.imageUrl}
-              alt={post.title}
-              className="w-full rounded-lg mb-6 max-h-96 object-cover"
-            />
-          )}
-          
+            {/* Post Images */}
           {post.images && post.images.length > 0 && (
             <div className="relative w-full aspect-video bg-gray-900 rounded-lg mb-6 overflow-hidden">
               <img
-                src={`http://localhost:5000${post.images[currentImageIndex]}`}
+                src={post.images[currentImageIndex]}
                 alt={`${post.title} ${currentImageIndex + 1}`}
                 className="w-full h-full object-contain"
                 loading="lazy"
@@ -203,7 +195,6 @@ const PostDetailPage = () => {
                   <div className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/60 text-white px-3 py-1 rounded-full text-sm">
                     {currentImageIndex + 1} / {post.images!.length}
                   </div>
-
                 </>
               )}
             </div>

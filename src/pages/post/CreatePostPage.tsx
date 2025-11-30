@@ -11,8 +11,7 @@ const CreatePostPage = () => {
     tags: '',
     imageUrl: '',
   });
-  const [selectedImages, setSelectedImages] = useState<File[]>([]);
-  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const isEditing = !!id;
@@ -46,13 +45,10 @@ const CreatePostPage = () => {
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    setSelectedImages(files);
-    
-    const previews = files.map(file => URL.createObjectURL(file));
-    setImagePreviews(previews);
+    setSelectedFiles(files);
   };
 
-   const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
@@ -63,30 +59,19 @@ const CreatePostPage = () => {
         .map((tag) => tag.trim())
         .filter((tag) => tag);
 
-      let imageUrls: string[] = [];
+      const formDataToSend = new FormData();
+      formDataToSend.append('title', formData.title);
+      formDataToSend.append('content', formData.content);
+      formDataToSend.append('tags', JSON.stringify(tagsArray));
       
-      // Upload images first if selected
-      if (selectedImages.length > 0) {
-        console.log('📤 Uploading images:', selectedImages.length);
-        const uploadRes = await postAPI.uploadPostImages(selectedImages);
-        console.log('✅ Upload response:', uploadRes.data);
-        imageUrls = uploadRes.data.images;
-        console.log('🖼️ Image URLs:', imageUrls);
-      }
+      selectedFiles.forEach((file) => {
+        formDataToSend.append('images', file);
+      });
 
-      const data = {
-        title: formData.title,
-        content: formData.content,
-        tags: tagsArray,
-        imageUrl: formData.imageUrl,
-        images: imageUrls,
-      };
-      
-      console.log('📝 Creating post with data:', data);
       if (isEditing) {
-        await postAPI.updatePost(id, data);
+        await postAPI.updatePost(id, formDataToSend);
       } else {
-        await postAPI.createPost(data);
+        await postAPI.createPost(formDataToSend);
       }
 
       navigate('/posts');
@@ -96,6 +81,7 @@ const CreatePostPage = () => {
       setLoading(false);
     }
   };
+
 
   return (
     <div className="min-h-screen bg-gray-100 py-8">
@@ -157,40 +143,19 @@ const CreatePostPage = () => {
           </div>
 
           <div>
-            <label htmlFor="imageUrl" className="block text-sm font-medium text-gray-700 mb-1">
-              Image URL (optional)
-            </label>
-            <input
-              type="url"
-              id="imageUrl"
-              name="imageUrl"
-              value={formData.imageUrl}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-northeastern-red"
-              placeholder="https://example.com/image.jpg"
-            />
-          </div>
-
-          <div>
             <label htmlFor="images" className="block text-sm font-medium text-gray-700 mb-1">
-              Upload Multiple Images (optional)
+              Upload Images (optional)
             </label>
             <input
               type="file"
               id="images"
-              multiple
               accept="image/*"
-              onChange={handleImageChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              multiple
+              onChange={(e) => setSelectedFiles(Array.from(e.target.files || []))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-northeastern-red"
             />
-            {imagePreviews.length > 0 && (
-              <div className="mt-2 grid grid-cols-3 gap-2">
-                {imagePreviews.map((preview, idx) => (
-                  <img key={idx} src={preview} alt={`Preview ${idx}`} className="w-full h-24 object-cover rounded" />
-                ))}
-              </div>
-            )}
           </div>
+
 
           <div className="flex space-x-4 pt-4">
             <button

@@ -96,17 +96,17 @@ const PostsPage = () => {
                   )}
                 </div>
 
-                <Link to={`/posts/${post._id}`}>
-                  <h2 className="text-2xl font-bold text-gray-800 mb-3 hover:text-northeastern-red transition">
-                    {post.title}
-                  </h2>
-                  <p className="text-gray-600 mb-4 line-clamp-3">{post.content}</p>
-                </Link>
+               <Link to={`/posts/${post._id}`}>
+                <h2 className="text-2xl font-bold text-gray-800 mb-3 hover:text-northeastern-red transition">
+                  {post.title}
+                </h2>
+                <p className="text-gray-600 mb-4 line-clamp-3">{post.content}</p>
+              </Link>
 
                 {post.images && post.images.length > 0 && (
                   <div className="relative w-full aspect-video bg-gray-900 rounded-lg overflow-hidden mb-4">
                     <img
-                      src={`http://localhost:5000${post.images[imageIndexes[post._id] || 0]}`}
+                      src={post.images[imageIndexes[post._id] || 0]}
                       alt={post.title}
                       className="w-full h-full object-contain"
                       loading="lazy"

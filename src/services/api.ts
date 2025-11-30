@@ -70,8 +70,12 @@ export const postAPI = {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
   },
-  createPost: (data: CreatePostData) => api.post<{ post: Post }>('/posts', data),
-  updatePost: (id: string, data: Partial<CreatePostData>) => api.put<{ post: Post }>(`/posts/${id}`, data),
+  createPost: (data: CreatePostData | FormData) => api.post<{ post: Post }>('/posts', data, {
+    headers: data instanceof FormData ? { 'Content-Type': 'multipart/form-data' } : undefined,
+  }),
+  updatePost: (id: string, data: Partial<CreatePostData> | FormData) => api.put<{ post: Post }>(`/posts/${id}`, data, {
+    headers: data instanceof FormData ? { 'Content-Type': 'multipart/form-data' } : undefined,
+  }),
   deletePost: (id: string) => api.delete(`/posts/${id}`),
   toggleLike: (id: string) => api.post(`/posts/${id}/like`),
   addComment: (id: string, text: string, parentCommentId?: string) => api.post(`/posts/${id}/comment`, { text, parentCommentId }),
