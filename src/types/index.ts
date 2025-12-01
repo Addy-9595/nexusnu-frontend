@@ -121,3 +121,21 @@ export interface ApiResponse<T> {
   data?: T;
   error?: string;
 }
+
+export interface Message {
+  _id: string;
+  sender: User;
+  recipient: User;
+  content: string;
+  read: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Conversation {
+  _id: string;
+  otherUser: User;
+  lastMessage?: Message;
+  unreadCount: number;
+  updatedAt: string;
+}

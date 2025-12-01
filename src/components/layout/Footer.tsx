@@ -52,7 +52,7 @@ const Footer = () => {
         <div className="border-t border-white/10 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <p className="text-northeastern-gray-400 text-sm text-center md:text-left">
-              &copy; 2025 NexusNU. All rights reserved.
+              &copy; 2025 NexusNU. All rights reserved to Nishant Patil & Atharva Dalvi.
             </p>
             <div className="flex flex-wrap justify-center md:justify-end space-x-4 lg:space-x-6 text-sm text-northeastern-gray-400">
               <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>

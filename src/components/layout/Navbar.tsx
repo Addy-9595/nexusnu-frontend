@@ -1,11 +1,30 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { chatAPI } from '../../services/api';
 
 const Navbar = () => {
   const { user, isAuthenticated, logout, loading } = useAuth();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      const loadUnread = async () => {
+        try {
+          const res = await chatAPI.getConversations();
+          const total = res.data.conversations.reduce((sum, conv) => sum + conv.unreadCount, 0);
+          setUnreadCount(total);
+        } catch (error) {
+          console.error('Load unread error:', error);
+        }
+      };
+      loadUnread();
+      const interval = setInterval(loadUnread, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [isAuthenticated]);
 
   const handleLogout = () => {
     logout();
@@ -40,7 +59,6 @@ const Navbar = () => {
     <nav className="bg-gradient-to-r from-northeastern-red via-northeastern-red-dark to-northeastern-black text-white shadow-neu backdrop-blur-sm sticky top-0 z-50 animate-fade-in">
       <div className="container mx-auto px-4 lg:px-8">
         <div className="flex justify-between items-center h-16 lg:h-20">
-          {/* Logo */}
           <Link to="/" className="flex items-center space-x-2 lg:space-x-3 group z-50">
             <div className="w-10 h-10 lg:w-12 lg:h-12 bg-white rounded-xl flex items-center justify-center shadow-lg transform group-hover:scale-105 transition-all duration-300">
               <span className="text-2xl lg:text-3xl font-black text-northeastern-red" style={{ fontFamily: 'Georgia, serif' }}>N</span>
@@ -53,7 +71,6 @@ const Navbar = () => {
             </span>
           </Link>
 
-          {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center space-x-8">
             <Link 
               to="/" 
@@ -81,6 +98,17 @@ const Navbar = () => {
                   className="text-base font-semibold hover:text-gray-200 transition-colors relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 hover:after:w-full after:bg-white after:transition-all after:duration-300"
                 >
                   Users
+                </Link>
+                <Link 
+                  to="/chat" 
+                  className="relative text-base font-semibold hover:text-gray-200 transition-colors after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 hover:after:w-full after:bg-white after:transition-all after:duration-300"
+                >
+                  Messages
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-2 -right-3 w-5 h-5 bg-white text-northeastern-red rounded-full flex items-center justify-center text-xs font-bold">
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </span>
+                  )}
                 </Link>
                 {user.role === 'admin' && (
                   <Link 
@@ -126,7 +154,6 @@ const Navbar = () => {
             )}
           </div>
 
-          {/* Mobile Menu Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="lg:hidden z-50 p-2 rounded-lg hover:bg-white/10 transition-colors"
@@ -153,7 +180,6 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
       <div
         className={`lg:hidden fixed inset-0 bg-northeastern-black/95 backdrop-blur-lg transition-all duration-300 ${
           mobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
@@ -192,6 +218,18 @@ const Navbar = () => {
                   className="text-white text-xl font-semibold py-3 px-4 rounded-lg hover:bg-white/10 transition-colors"
                 >
                   Users
+                </Link>
+                <Link
+                  to="/chat"
+                  onClick={closeMobileMenu}
+                  className="relative text-white text-xl font-semibold py-3 px-4 rounded-lg hover:bg-white/10 transition-colors"
+                >
+                  Messages
+                  {unreadCount > 0 && (
+                    <span className="absolute top-3 right-4 w-6 h-6 bg-white text-northeastern-red rounded-full flex items-center justify-center text-sm font-bold">
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </span>
+                  )}
                 </Link>
                 {user.role === 'admin' && (
                   <Link
