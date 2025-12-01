@@ -167,6 +167,30 @@ const ProfilePage = () => {
             </div>
           )}
 
+          {/* Certifications Section */}
+{user.certifications && user.certifications.length > 0 && (
+  <div className="mt-6">
+    <h3 className="text-sm font-semibold text-gray-700 mb-2">Certifications</h3>
+    <div className="space-y-2">
+      {user.certifications.map((cert, index) => (
+        <div key={index} className="border border-gray-200 rounded-md p-3">
+          <p className="font-semibold text-gray-800">{cert.certificate_name}</p>
+          <p className="text-sm text-gray-600">{cert.issuer}</p>
+          {cert.completion_date && (
+            <p className="text-xs text-gray-500">{cert.completion_date}</p>
+          )}
+          {cert.credential_url && (
+            <a href={cert.credential_url} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline">
+              View Certificate
+            </a>
+          )}
+          {cert.verified && <span className="text-green-600 text-xs ml-2">✓ Verified</span>}
+        </div>
+      ))}
+    </div>
+  </div>
+)}
+
           {/* Stats Section */}
           <div className="flex space-x-8 mt-6 text-sm">
             <div>

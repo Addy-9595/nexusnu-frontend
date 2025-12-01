@@ -286,8 +286,9 @@ const PostDetailPage = () => {
               {post.comments.filter(c => !c.parentCommentId).map((comment) => {
                 const commentUser = typeof comment.user === 'object' ? comment.user : null;
                 const replies = post.comments.filter(c => c.parentCommentId === comment._id);
+                const parentUserName = commentUser?.name || 'Unknown';
                 return (
-                  <div key={comment._id}>
+                  <div key={comment._id} id={`comment-${comment._id}`}>
                     <div className="border-l-4 border-northeastern-red pl-4">
                       <div className="flex items-center mb-2">
                         {commentUser && (
@@ -314,27 +315,29 @@ const PostDetailPage = () => {
                         )}
                       </div>
                     </div>
-                     {replies.length > 0 && (
-                      <div className="ml-8 mt-3 space-y-3">
+                       {replies.length > 0 && (
+                      <div className="ml-16 mt-4 space-y-3 pl-6">
                         {replies.map(reply => {
                           const replyUser = typeof reply.user === 'object' ? reply.user : null;
                           return (
-                            <div key={reply._id} className="bg-gray-50 border-l-4 border-blue-400 pl-4 py-3 rounded-r">
+                            <div key={reply._id} className="bg-gray-50 border-l-3 border-blue-400 pl-4 py-2.5 rounded">
                               <div className="flex items-center mb-2">
-                                <span className="text-xs text-blue-600 font-semibold mr-2">↳ Reply</span>
                                 {replyUser && (
                                   <Link to={`/profile/${replyUser._id}`} className="flex items-center">
-                                    <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold mr-2 text-xs">
+                                    <div className="w-7 h-7 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold mr-2 text-xs">
                                       {replyUser.name.charAt(0).toUpperCase()}
                                     </div>
-                                    <p className="font-semibold text-gray-800 text-xs">{replyUser.name}</p>
+                                    <p className="font-semibold text-gray-900 text-sm">{replyUser.name}</p>
                                   </Link>
                                 )}
+                                <span className="text-xs text-gray-600 ml-2">
+                                  Replying to <a href={`#comment-${comment._id}`} className="text-blue-600 hover:underline">@{parentUserName}</a>
+                                </span>
                                 <span className="text-xs text-gray-500 ml-auto">{new Date(reply.createdAt).toLocaleString()}</span>
                               </div>
-                              <p className="text-gray-700 text-sm ml-6">{reply.text}</p>
+                              <p className="text-gray-800 text-sm">{reply.text}</p>
                               {canDeleteComment(reply) && (
-                                <button onClick={() => handleDeleteComment(reply._id!)} className="text-xs text-red-600 hover:underline mt-2 ml-6">
+                                <button onClick={() => handleDeleteComment(reply._id!)} className="text-xs text-red-600 hover:underline mt-2">
                                   Delete
                                 </button>
                               )}

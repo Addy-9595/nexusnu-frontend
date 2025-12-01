@@ -16,7 +16,17 @@ export interface User {
   major?: string;
   department?: string;
   profilePicture?: string;
-  skills?: string[];  // ⭐ ADDED: Skills array
+  skills?: string[];
+certifications?: Array<{
+  platform: string;
+  certificate_name: string;
+  issuer: string;
+  completion_date: string;
+  credential_id: string;
+  credential_url: string;
+  verified: boolean;
+  notes?: string;
+}>;
   followers: string[];
   following: string[];
   isVerified: boolean;
