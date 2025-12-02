@@ -1,3 +1,5 @@
+// frontend/src/services/api.ts
+
 import axios from 'axios';
 import type {
   User,
@@ -8,6 +10,8 @@ import type {
   CreatePostData,
   Event,
   CreateEventData,
+  Message,
+  Conversation,
 } from '../types';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
@@ -99,6 +103,18 @@ export const eventAPI = {
   deleteEvent: (id: string) => api.delete(`/events/${id}`),
   joinEvent: (id: string) => api.post(`/events/${id}/join`),
   leaveEvent: (id: string) => api.post(`/events/${id}/leave`),
+};
+
+export const chatAPI = {
+  getConversations: () => api.get<{ conversations: Conversation[] }>('/chat/conversations'),
+  getMessages: (conversationId: string, page?: number) => 
+    api.get<{ messages: Message[]; pagination: any }>(`/chat/${conversationId}?page=${page || 1}`),
+  sendMessage: (recipientId: string, content: string) => 
+    api.post<{ message: string; data: Message }>('/chat/send', { recipientId, content }),
+  markAsRead: (messageId: string) => 
+    api.put(`/chat/${messageId}/read`),
+  deleteMessage: (messageId: string) => 
+    api.delete(`/chat/${messageId}`),
 };
 
 export default api;

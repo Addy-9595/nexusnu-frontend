@@ -1,3 +1,5 @@
+// frontend/src/pages/profile/ProfilePage.tsx
+
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
@@ -26,9 +28,17 @@ const ProfilePage = () => {
         setPosts(response.data.posts);
         setEvents(response.data.events);
         
-        // Check if following
         if (currentUser) {
-          setIsFollowing(response.data.user.followers.includes(currentUser._id));
+          const followStatus = response.data.user.followers.some(
+            (follower: any) => follower._id === currentUser._id
+          );
+          console.log('🔍 FOLLOW CHECK:', {
+            currentUserId: currentUser._id,
+            targetUserId: id,
+            followersArray: response.data.user.followers.map((f: any) => f._id),
+            isFollowing: followStatus
+          });
+          setIsFollowing(followStatus);
         }
       } catch (error) {
         console.error('Error fetching profile:', error);
@@ -41,22 +51,24 @@ const ProfilePage = () => {
   }, [id, currentUser]);
 
   const handleFollowToggle = async () => {
-    if (!id) return;
+    if (!id || !currentUser) return;
 
     try {
       if (isFollowing) {
+        console.log('🔴 UNFOLLOW ACTION:', { targetId: id });
         await userAPI.unfollowUser(id);
         setIsFollowing(false);
         setUser((prev) => prev ? {
           ...prev,
-          followers: prev.followers.filter((f) => f !== currentUser?._id)
+          followers: prev.followers.filter((f: any) => f._id !== currentUser._id)
         } : null);
       } else {
+        console.log('🔵 FOLLOW ACTION:', { targetId: id });
         await userAPI.followUser(id);
         setIsFollowing(true);
         setUser((prev) => prev ? {
           ...prev,
-          followers: [...prev.followers, currentUser!._id]
+          followers: [...prev.followers, { _id: currentUser._id, name: currentUser.name }] as any
         } : null);
       }
     } catch (error) {
@@ -83,20 +95,19 @@ const ProfilePage = () => {
   return (
     <div className="min-h-screen bg-gray-100 py-8">
       <div className="container mx-auto px-4">
-        {/* Profile Header */}
         <div className="bg-white rounded-lg shadow-md p-8 mb-8">
           <div className="flex items-start justify-between">
             <div className="flex items-center space-x-6">
-              {/* Profile Picture with Image Support */}
               <div className="w-24 h-24 bg-northeastern-red rounded-full flex items-center justify-center text-white text-4xl font-bold overflow-hidden">
                 {user.profilePicture ? (
-              <img
-                src={user.profilePicture.startsWith('http') ? user.profilePicture : `${BASE_URL}${user.profilePicture}`}
-                alt={user.name}
-                className="w-full h-full object-cover"
-              />) : (
-              user.name.charAt(0).toUpperCase()
-              )}
+                  <img
+                    src={user.profilePicture.startsWith('http') ? user.profilePicture : `${BASE_URL}${user.profilePicture}`}
+                    alt={user.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  user.name.charAt(0).toUpperCase()
+                )}
               </div>
               
               <div>
@@ -124,16 +135,25 @@ const ProfilePage = () => {
             </div>
 
             {currentUser && !isOwnProfile && (
-              <button
-                onClick={handleFollowToggle}
-                className={`px-6 py-2 rounded-lg font-semibold transition ${
-                  isFollowing
-                    ? 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                    : 'bg-northeastern-red text-white hover:bg-red-700'
-                }`}
-              >
-                {isFollowing ? 'Unfollow' : 'Follow'}
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleFollowToggle}
+                  className={`px-6 py-2 rounded-lg font-semibold transition ${
+                    isFollowing
+                      ? 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                      : 'bg-northeastern-red text-white hover:bg-red-700'
+                  }`}
+                >
+                  {isFollowing ? 'Unfollow' : 'Follow'}
+                </button>
+                
+                <Link
+                  to={`/chat/${id}`}
+                  className="px-6 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition"
+                >
+                  Send Message
+                </Link>
+              </div>
             )}
 
             {isOwnProfile && (
@@ -150,7 +170,6 @@ const ProfilePage = () => {
             <p className="mt-6 text-gray-700">{user.bio}</p>
           )}
 
-          {/* Skills Section */}
           {user.skills && user.skills.length > 0 && (
             <div className="mt-6">
               <h3 className="text-sm font-semibold text-gray-700 mb-2">Skills</h3>
@@ -167,7 +186,29 @@ const ProfilePage = () => {
             </div>
           )}
 
-          {/* Stats Section */}
+          {user.certifications && user.certifications.length > 0 && (
+            <div className="mt-6">
+              <h3 className="text-sm font-semibold text-gray-700 mb-2">Certifications</h3>
+              <div className="space-y-2">
+                {user.certifications.map((cert, index) => (
+                  <div key={index} className="border border-gray-200 rounded-md p-3">
+                    <p className="font-semibold text-gray-800">{cert.certificate_name}</p>
+                    <p className="text-sm text-gray-600">{cert.issuer}</p>
+                    {cert.completion_date && (
+                      <p className="text-xs text-gray-500">{cert.completion_date}</p>
+                    )}
+                    {cert.credential_url && (
+                      <a href={cert.credential_url} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline">
+                        View Certificate
+                      </a>
+                    )}
+                    {cert.verified && <span className="text-green-600 text-xs ml-2">✓ Verified</span>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div className="flex space-x-8 mt-6 text-sm">
             <div>
               <span className="font-bold text-lg">{user.followers.length}</span>
@@ -188,7 +229,6 @@ const ProfilePage = () => {
           </div>
         </div>
 
-        {/* Posts Section */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-8">
           <h2 className="text-2xl font-bold mb-6">Posts</h2>
           {posts.length === 0 ? (
@@ -216,7 +256,6 @@ const ProfilePage = () => {
           )}
         </div>
 
-        {/* Events Section */}
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-2xl font-bold mb-6">Events Organized</h2>
           {events.length === 0 ? (

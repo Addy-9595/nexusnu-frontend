@@ -17,7 +17,7 @@ import CreateEventPage from './pages/event/CreateEventPage';
 import EventDetailPage from './pages/event/EventDetailPage';
 import UsersPage from './pages/UsersPage';
 import AdminDashboard from './pages/admin/AdminDashboard';
-
+import ChatPage from "./pages/chat/ChatPage";
 // Protected Route Component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -124,6 +124,24 @@ function AppContent() {
             }
           />
           <Route path="/profile/:id" element={<ProfilePage />} />
+
+{/* Chat Routes */}
+          <Route
+  path="/chat"
+  element={
+    <ProtectedRoute>
+      <ChatPage />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/chat/:userId"
+  element={
+    <ProtectedRoute>
+      <ChatPage />
+    </ProtectedRoute>
+  }
+/>
           
           {/* Admin Routes */}
           <Route

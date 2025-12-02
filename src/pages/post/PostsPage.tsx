@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { postAPI } from '../../services/api';
 import type { Post } from '../../types';
 
 const PostsPage = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [imageIndexes, setImageIndexes] = useState<{[key: string]: number}>({});
+  const navigate = useNavigate();
 
    useEffect(() => {
     const fetchPosts = async () => {
@@ -26,6 +27,24 @@ const PostsPage = () => {
 
     fetchPosts();
   }, []);
+
+  const handleLike = async (e: React.MouseEvent, postId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+
+    try {
+      await postAPI.toggleLike(postId);
+      const response = await postAPI.getAllPosts();
+      setPosts(response.data.posts);
+    } catch (error) {
+      console.error('Error toggling like:', error);
+    }
+  };
 
   if (loading) {
     return (
@@ -160,13 +179,18 @@ const PostsPage = () => {
                   </div>
                 )}
 
-                <div className="flex items-center space-x-6 text-sm text-gray-500">
-                  <span className="flex items-center">
-                    ❤️ {post.likes.length} likes
-                  </span>
-                  <span className="flex items-center">
+                  <div className="flex items-center space-x-6 text-sm text-gray-500">
+                  <button
+                    onClick={(e) => handleLike(e, post._id)}
+                    className={`flex items-center hover:text-northeastern-red transition ${
+                      user && post.likes.includes(user._id) ? 'text-red-600' : ''
+                    }`}
+                  >
+                    {user && post.likes.includes(user._id) ? '❤️' : '🤍'} {post.likes.length} likes
+                  </button>
+                  <Link to={`/posts/${post._id}`} className="flex items-center hover:text-northeastern-red transition">
                     💬 {post.comments.length} comments
-                  </span>
+                  </Link>
                   <Link
                     to={`/posts/${post._id}`}
                     className="text-northeastern-red hover:underline font-semibold"

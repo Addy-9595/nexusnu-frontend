@@ -16,7 +16,17 @@ export interface User {
   major?: string;
   department?: string;
   profilePicture?: string;
-  skills?: string[];  // ⭐ ADDED: Skills array
+  skills?: string[];
+certifications?: Array<{
+  platform: string;
+  certificate_name: string;
+  issuer: string;
+  completion_date: string;
+  credential_id: string;
+  credential_url: string;
+  verified: boolean;
+  notes?: string;
+}>;
   followers: string[];
   following: string[];
   isVerified: boolean;
@@ -110,4 +120,22 @@ export interface ApiResponse<T> {
   message?: string;
   data?: T;
   error?: string;
+}
+
+export interface Message {
+  _id: string;
+  sender: User;
+  recipient: User;
+  content: string;
+  read: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Conversation {
+  _id: string;
+  otherUser: User;
+  lastMessage?: Message;
+  unreadCount: number;
+  updatedAt: string;
 }

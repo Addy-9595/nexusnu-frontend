@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { userAPI } from '../../services/api';
 import Cropper, { type Point, type Area } from 'react-easy-crop';
+import SkillsAutocomplete from '../../components/user/SkillsAutocomplete';
+import CertificationFetch from '../../components/user/CertificationFetch';
 
 const EditProfilePage = () => {
   const navigate = useNavigate();
@@ -11,13 +13,13 @@ const EditProfilePage = () => {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
   const [formData, setFormData] = useState({
-    name: '',
-    bio: '',
-    major: '',
-    department: '',
-    skills: [] as string[],
-  });
-  const [newSkill, setNewSkill] = useState('');
+  name: '',
+  bio: '',
+  major: '',
+  department: '',
+  skills: [] as string[],
+  certifications: [] as any[],
+});
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewImage, setPreviewImage] = useState<string>('');
   
@@ -38,6 +40,7 @@ const EditProfilePage = () => {
         major: user.major || '',
         department: user.department || '',
         skills: user.skills || [],
+        certifications: user.certifications || [],
       });
       
       if (user.profilePicture) {
@@ -123,38 +126,20 @@ const EditProfilePage = () => {
       reader.readAsDataURL(file);
     }
   };
-
-  const handleAddSkill = () => {
-    const skill = newSkill.trim();
-    if (skill && !formData.skills.includes(skill)) {
-      setFormData(prev => ({
-        ...prev,
-        skills: [...prev.skills, skill]
-      }));
-      setNewSkill('');
-    }
-  };
-
-  const handleRemoveSkill = (skillToRemove: string) => {
-    setFormData(prev => ({
-      ...prev,
-      skills: prev.skills.filter(s => s !== skillToRemove)
-    }));
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
     try {
-      if (selectedFile) {
-        setUploading(true);
-        await userAPI.uploadProfilePicture(selectedFile);
-        setUploading(false);
-      }
+  if (selectedFile) {
+    setUploading(true);
+    await userAPI.uploadProfilePicture(selectedFile);
+    setUploading(false);
+  }
 
-      await userAPI.updateProfile(formData);
+  console.log('💾 Saving profile with certs:', formData.certifications);
+  await userAPI.updateProfile(formData);
       
       if (refreshUser) {
         await refreshUser();
@@ -336,49 +321,22 @@ const EditProfilePage = () => {
               </div>
             )}
 
-            {/* Skills Section */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Skills
-              </label>
-              <div className="flex gap-2 mb-3">
-                <input
-                  type="text"
-                  value={newSkill}
-                  onChange={(e) => setNewSkill(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddSkill())}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-northeastern-red"
-                  placeholder="Add a skill (e.g., JavaScript, React, Python)"
-                />
-                <button
-                  type="button"
-                  onClick={handleAddSkill}
-                  className="px-4 py-2 bg-northeastern-red text-white rounded-md hover:bg-red-700 transition"
-                >
-                  Add
-                </button>
-              </div>
-              
-              <div className="flex flex-wrap gap-2">
-                {formData.skills.map((skill, index) => (
-                  <span
-                    key={index}
-                    className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-gray-200 text-gray-800"
-                  >
-                    {skill}
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveSkill(skill)}
-                      className="ml-2 text-gray-600 hover:text-red-600"
-                    >
-                      ×
-                    </button>
-                  </span>
-                ))}
-              </div>
-              {formData.skills.length === 0 && (
-                <p className="text-sm text-gray-500 mt-2">No skills added yet</p>
-              )}
+{/* Skills Section */}
+<div>
+  <label className="block text-sm font-medium text-gray-700 mb-2">
+    Skills
+  </label>
+  <SkillsAutocomplete
+    selected={formData.skills}
+    onChange={(skills) => setFormData(prev => ({ ...prev, skills }))}
+  />
+</div>
+{/* Certifications Section */}
+<CertificationFetch
+  certifications={formData.certifications}
+  onChange={(certifications) => setFormData(prev => ({ ...prev, certifications }))}
+/>
             </div>
 
             <div className="flex space-x-4">
