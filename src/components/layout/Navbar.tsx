@@ -181,12 +181,12 @@ const Navbar = () => {
       </div>
 
       <div
-        className={`lg:hidden fixed inset-0 bg-northeastern-black/95 backdrop-blur-lg transition-all duration-300 ${
+        className={`lg:hidden fixed inset-0 backdrop-blur-lg transition-all duration-300 ${
           mobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
         }`}
         style={{ top: '64px' }}
       >
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 py-8 bg-northeastern-red/100">
           <div className="flex flex-col space-y-4">
             <Link
               to="/"
