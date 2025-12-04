@@ -93,8 +93,9 @@ export default function ChatPage() {
       }
 
       scrollToBottom();
-    } catch (error: any) {
-      alert(error.response?.data?.message || 'Failed to send message');
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to send message';
+      alert(errorMessage);
     }
   };
 
