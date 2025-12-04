@@ -74,7 +74,7 @@ export default function ChatPage() {
 
     try {
       await chatAPI.sendMessage(selectedConversation.otherUser._id, content);
-      
+
       if (isTemp) {
         console.log('🔄 RELOADING CONVERSATIONS AFTER FIRST MESSAGE');
         await loadConversations();
@@ -91,7 +91,7 @@ export default function ChatPage() {
         await loadMessages(selectedConversation._id);
         await loadConversations();
       }
-      
+
       scrollToBottom();
     } catch (error: any) {
       alert(error.response?.data?.message || 'Failed to send message');

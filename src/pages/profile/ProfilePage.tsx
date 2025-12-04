@@ -27,7 +27,7 @@ const ProfilePage = () => {
         setUser(response.data.user);
         setPosts(response.data.posts);
         setEvents(response.data.events);
-        
+
         if (currentUser) {
           const followStatus = response.data.user.followers.some(
             (follower: any) => follower._id === currentUser._id
@@ -48,6 +48,7 @@ const ProfilePage = () => {
     };
 
     fetchProfile();
+    window.scrollTo(0, 0);
   }, [id, currentUser]);
 
   const handleFollowToggle = async () => {
@@ -146,12 +147,12 @@ const ProfilePage = () => {
                 >
                   {isFollowing ? 'Unfollow' : 'Follow'}
                 </button>
-                
+
                 <Link
                   to={`/chat/${id}`}
                   className="px-6 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition"
                 >
-                  Send Message
+                  Message
                 </Link>
               </div>
             )}

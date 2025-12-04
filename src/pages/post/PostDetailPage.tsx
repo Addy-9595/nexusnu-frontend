@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { postAPI } from '../../services/api';
-import type { Post } from '../../types';
+import { useRef } from 'react';
+import type { Post, Comment } from '../../types';
 
 const PostDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -14,6 +15,9 @@ const PostDetailPage = () => {
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const newCommentRef = useRef<HTMLDivElement>(null);
+  const [isReply, setisReply] = useState(false);
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -30,6 +34,9 @@ const PostDetailPage = () => {
     };
 
     fetchPost();
+    window.scrollTo(0, 0);
+    setCommentText('');
+    setReplyingTo(null);
   }, [id]);
 
   const handleLike = async () => {
@@ -70,7 +77,7 @@ const PostDetailPage = () => {
 
   const handleDeleteComment = async (commentId: string) => {
     if (!window.confirm('Delete this comment?')) return;
-    
+
     try {
       await postAPI.deleteComment(id!, commentId);
       const response = await postAPI.getPostById(id!);
@@ -80,7 +87,7 @@ const PostDetailPage = () => {
     }
   };
 
-  const canDeleteComment = (comment: any) => {
+  const canDeleteComment = (comment: Comment) => {
     if (!user) return false;
     if (user.role === 'admin') return true;
     if (post?.author._id === user._id) return true;
@@ -251,6 +258,7 @@ const PostDetailPage = () => {
               )}
               <textarea
                 value={commentText}
+                ref={textareaRef}
                 onChange={(e) => setCommentText(e.target.value)}
                 placeholder={replyingTo ? "Write a reply..." : "Write a comment..."}
                 rows={3}
@@ -258,6 +266,12 @@ const PostDetailPage = () => {
               />
               <button
                 type="submit"
+                onClick={() => {
+                    setTimeout(() => {
+                    newCommentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  }, 100);
+                  {setisReply(replyingTo !== null);}}
+                }
                 disabled={submitting || !commentText.trim()}
                 className="bg-northeastern-red text-white px-6 py-2 rounded-lg hover:bg-red-700 transition disabled:opacity-50"
               >
@@ -287,8 +301,10 @@ const PostDetailPage = () => {
                 const commentUser = typeof comment.user === 'object' ? comment.user : null;
                 const replies = post.comments.filter(c => c.parentCommentId === comment._id);
                 const parentUserName = commentUser?.name || 'Unknown';
+                const parentUserId = commentUser?._id || 'Unkown';
                 return (
-                  <div key={comment._id} id={`comment-${comment._id}`}>
+                  <div key={comment._id} id={`comment-${comment._id}`} ref={isReply? null : newCommentRef}>
+                    {/* Chat box window starts below */}
                     <div className="border-l-4 border-northeastern-red pl-4">
                       <div className="flex items-center mb-2">
                         {commentUser && (
@@ -301,10 +317,19 @@ const PostDetailPage = () => {
                         )}
                         <span className="text-xs text-gray-500 ml-auto">{new Date(comment.createdAt).toLocaleString()}</span>
                       </div>
-                      <p className="text-gray-700">{comment.text}</p>
+                      <div className="break-words whitespace-pre-wrap overflow-wrap-anywhere">
+                        <p className="text-gray-700">{comment.text}</p>
+                      </div>
                       <div className="mt-2 flex gap-2">
                         {isAuthenticated && (
-                          <button onClick={() => setReplyingTo(comment._id!)} className="text-xs text-northeastern-red hover:underline">
+                          <button onClick={() => {
+                            setReplyingTo(comment._id!);
+                            setTimeout(() => {
+                                textareaRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                textareaRef.current?.focus();
+                              }, 100);
+                           }}
+                           className="text-xs text-northeastern-red hover:underline">
                             Reply
                           </button>
                         )}
@@ -314,38 +339,47 @@ const PostDetailPage = () => {
                           </button>
                         )}
                       </div>
-                    </div>
-                       {replies.length > 0 && (
+                      {/* Replies window starts below */}
+                      {replies.length > 0 && (
                       <div className="ml-16 mt-4 space-y-3 pl-6">
                         {replies.map(reply => {
                           const replyUser = typeof reply.user === 'object' ? reply.user : null;
                           return (
-                            <div key={reply._id} className="bg-gray-50 border-l-3 border-blue-400 pl-4 py-2.5 rounded">
-                              <div className="flex items-center mb-2">
-                                {replyUser && (
-                                  <Link to={`/profile/${replyUser._id}`} className="flex items-center">
-                                    <div className="w-7 h-7 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold mr-2 text-xs">
-                                      {replyUser.name.charAt(0).toUpperCase()}
-                                    </div>
-                                    <p className="font-semibold text-gray-900 text-sm">{replyUser.name}</p>
-                                  </Link>
+                            <div key={reply._id} ref={isReply? newCommentRef : null}
+                              className="bg-gray-50 border-l-3 border-blue-400 pl-4 py-2.5 pr-4 rounded">
+                              <div className="ml-1 pl-4 border-l-4 border-gray-300"> {/* The border indicator for replies */}
+                                <div className="flex items-center mb-2">
+                                  {replyUser && (
+                                    <Link to={`/profile/${replyUser._id}`} className="flex items-center">
+                                      <div className="w-7 h-7 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold mr-2 text-xs">
+                                        {replyUser.name.charAt(0).toUpperCase()}
+                                      </div>
+                                      <p className="font-semibold text-gray-900 text-sm">{replyUser.name}</p>
+                                    </Link>
+                                  )}
+                                  <span className="text-xs text-gray-600 ml-2">
+                                    Replying to
+                                    <Link to={`/profile/${parentUserId}`}
+                                     className="text-blue-600 ml-1 hover:underline">@{parentUserName}
+                                    </Link>
+                                  </span>
+                                  <span className="text-xs text-gray-500 ml-auto">{new Date(reply.createdAt).toLocaleString()}</span>
+                                </div>
+                                <div className="break-words whitespace-pre-wrap overflow-wrap-anywhere">
+                                  <p className="text-gray-800 text-sm">{reply.text}</p>
+                                </div>
+                                {canDeleteComment(reply) && (
+                                  <button onClick={() => handleDeleteComment(reply._id!)} className="text-xs text-red-600 hover:underline mt-2">
+                                    Delete
+                                  </button>
                                 )}
-                                <span className="text-xs text-gray-600 ml-2">
-                                  Replying to <a href={`#comment-${comment._id}`} className="text-blue-600 hover:underline">@{parentUserName}</a>
-                                </span>
-                                <span className="text-xs text-gray-500 ml-auto">{new Date(reply.createdAt).toLocaleString()}</span>
                               </div>
-                              <p className="text-gray-800 text-sm">{reply.text}</p>
-                              {canDeleteComment(reply) && (
-                                <button onClick={() => handleDeleteComment(reply._id!)} className="text-xs text-red-600 hover:underline mt-2">
-                                  Delete
-                                </button>
-                              )}
                             </div>
                           );
                         })}
                       </div>
-                    )}
+                    )} {/* Replies window ends here */}
+                    </div> {/* Chat box window ends here */}
                   </div>
                 );
               })}
