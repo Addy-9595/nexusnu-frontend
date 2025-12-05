@@ -3,6 +3,10 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
+import type {
+  Comment
+} from '../types';
+
 interface Post {
   _id: string;
   title: string;
@@ -12,7 +16,7 @@ interface Post {
     name: string;
   };
   likes: string[];
-  comments: any[];
+  comments: Comment[];
   tags: string[];
   createdAt: string;
 }
@@ -47,31 +51,32 @@ const Home = () => {
         // Fetch posts
         const postsRes = await api.get('/posts?limit=3');
         console.log('Posts Response:', postsRes.data); // Debug log
-       
+
         // Check if response.data is an array or if data is nested
         const postsData = Array.isArray(postsRes.data)
           ? postsRes.data
           : Array.isArray(postsRes.data.posts)
           ? postsRes.data.posts
           : [];
-       
+
         setRecentPosts(postsData);
 
         // Fetch events
         const eventsRes = await api.get('/events?limit=3');
         console.log('Events Response:', eventsRes.data); // Debug log
-       
+
         // Check if response.data is an array or if data is nested
         const eventsData = Array.isArray(eventsRes.data)
           ? eventsRes.data
           : Array.isArray(eventsRes.data.events)
           ? eventsRes.data.events
           : [];
-       
+
         setUpcomingEvents(eventsData);
-      } catch (error: any) {
+      } catch (error: Error | unknown) {
         console.error('Error fetching data:', error);
-        setError(error.response?.data?.message || 'Failed to load content');
+        const errorMessage = error instanceof Error ? error.message : 'Failed to load content';
+        setError(errorMessage);
         // Set empty arrays on error to prevent crashes
         setRecentPosts([]);
         setUpcomingEvents([]);

@@ -211,7 +211,7 @@ const Navbar = () => {
         }`}
         style={{ top: '64px' }}
       >
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 py-8 bg-northeastern-red/100">
           <div className="flex flex-col space-y-4">
             <Link
               to="/"

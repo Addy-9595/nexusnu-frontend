@@ -50,7 +50,7 @@ export default function MessageBubble({ message, isOwnMessage, onDelete }: Props
           >
             <p className="text-sm break-words">{message.content}</p>
           </div>
-          
+
           <div className={`flex items-center gap-2 mt-1 ${isOwnMessage ? 'justify-end' : 'justify-start'}`}>
             <span className="text-xs text-gray-500">{formatTime(message.createdAt)}</span>
             {isOwnMessage && message.read && (

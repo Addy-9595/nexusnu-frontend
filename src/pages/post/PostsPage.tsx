@@ -26,12 +26,13 @@ const PostsPage = () => {
     };
 
     fetchPosts();
+    window.scrollTo(0, 0);
   }, []);
 
   const handleLike = async (e: React.MouseEvent, postId: string) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     if (!isAuthenticated) {
       navigate('/login');
       return;
@@ -85,7 +86,6 @@ const PostsPage = () => {
           <div className="space-y-6">
             {posts.map((post) => (
               <div key={post._id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
-                
                 <div className="p-6">
                 <div className="flex items-center mb-4">
                   {post.author ? (
