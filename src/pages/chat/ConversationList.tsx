@@ -32,12 +32,7 @@ export default function ConversationList({ conversations, selectedId, onSelect }
         </div>
       ) : (
         <div>
-          {conversations.map((conv) => {
-            if (!conv.otherUser) {
-              console.error('❌ INVALID CONVERSATION:', conv);
-              return null;
-            }
-            return (
+          {conversations.filter(conv => conv.otherUser).map((conv) => (
             <button
               key={conv._id}
               onClick={() => onSelect(conv.otherUser._id, conv._id)}
@@ -84,8 +79,7 @@ export default function ConversationList({ conversations, selectedId, onSelect }
                 </div>
                </div>
             </button>
-            );
-          })}
+          ))}
         </div>
       )}
     </div>
