@@ -111,11 +111,21 @@ export default function ChatPage() {
 
   const startNewConversation = async (otherUserId: string) => {
     try {
+      console.log('🆕 START NEW CONVERSATION:', { otherUserId, currentUserId: user?._id });
+      
+      if (otherUserId === user?._id) {
+        console.error('❌ CANNOT MESSAGE SELF');
+        alert('Cannot message yourself');
+        navigate('/chat');
+        return;
+      }
+
       const existingConv = conversations.find(
         (c) => c.otherUser._id === otherUserId
       );
 
       if (existingConv) {
+        console.log('✅ FOUND EXISTING CONVERSATION:', existingConv._id);
         handleSelectConversation(otherUserId, existingConv._id);
         return;
       }
