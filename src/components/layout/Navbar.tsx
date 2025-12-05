@@ -36,6 +36,23 @@ const Navbar = () => {
     setMobileMenuOpen(false);
   };
 
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeMobileMenu();
+    };
+    document.addEventListener('keydown', handleEsc);
+    return () => document.removeEventListener('keydown', handleEsc);
+  }, []);
+
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => { document.body.style.overflow = 'unset'; };
+  }, [mobileMenuOpen]);
+
   if (loading) {
     return (
       <nav className="bg-gradient-to-r from-northeastern-red via-northeastern-red-dark to-northeastern-black text-white shadow-neu backdrop-blur-sm sticky top-0 z-50">
@@ -180,9 +197,17 @@ const Navbar = () => {
         </div>
       </div>
 
+      {mobileMenuOpen && (
+        <div
+          className="lg:hidden fixed inset-0 bg-black/50 z-40"
+          style={{ top: '64px' }}
+          onClick={closeMobileMenu}
+        />
+      )}
+
       <div
-        className={`lg:hidden fixed inset-0 bg-northeastern-black/95 backdrop-blur-lg transition-all duration-300 ${
-          mobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
+        className={`lg:hidden fixed left-0 right-0 bg-northeastern-black/95 backdrop-blur-lg transition-all duration-300 z-50 ${
+          mobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'
         }`}
         style={{ top: '64px' }}
       >
@@ -222,11 +247,11 @@ const Navbar = () => {
                 <Link
                   to="/chat"
                   onClick={closeMobileMenu}
-                  className="relative text-white text-xl font-semibold py-3 px-4 rounded-lg hover:bg-white/10 transition-colors"
+                  className="text-white text-xl font-semibold py-3 px-4 rounded-lg hover:bg-white/10 transition-colors flex items-center justify-between"
                 >
-                  Messages
+                  <span>Messages</span>
                   {unreadCount > 0 && (
-                    <span className="absolute top-3 right-4 w-6 h-6 bg-white text-northeastern-red rounded-full flex items-center justify-center text-sm font-bold">
+                    <span className="w-6 h-6 bg-white text-northeastern-red rounded-full flex items-center justify-center text-sm font-bold">
                       {unreadCount > 9 ? '9+' : unreadCount}
                     </span>
                   )}
