@@ -43,7 +43,7 @@ const PostsPage = () => {
   const handleLike = async (e: React.MouseEvent, postId: string) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     if (!isAuthenticated) {
       navigate('/login');
       return;
