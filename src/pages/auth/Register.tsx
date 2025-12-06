@@ -9,6 +9,7 @@ const Register = () => {
     password: '',
     role: 'student' as 'student' | 'professor' | 'admin',
     bio: '',
+    location: '',
     major: '',
     department: '',
   });
@@ -169,6 +170,20 @@ const Register = () => {
               placeholder="Tell us about yourself..."
             />
           </div>
+
+          <div>
+              <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">
+                Location
+              </label>
+              <input
+                type="text"
+                id="location"
+                name="location"
+                value={formData.location}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-northeastern-red"
+              />
+            </div>
 
           <button
             type="submit"

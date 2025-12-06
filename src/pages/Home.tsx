@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
 import type {
+  User,
   Comment
 } from '../types';
 
@@ -42,7 +43,7 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [searchResults, setSearchResults] = useState<User[]>([]);
   const [searching, setSearching] = useState(false);
 
   useEffect(() => {
@@ -102,7 +103,7 @@ const Home = () => {
     try {
       const response = await api.get('/users');
       const allUsers = response.data.users;
-      const filtered = allUsers.filter((u: any) =>
+      const filtered = allUsers.filter((u: User) =>
         u.name.toLowerCase().includes(query.toLowerCase()) ||
         u.email.toLowerCase().includes(query.toLowerCase()) ||
         u.major?.toLowerCase().includes(query.toLowerCase()) ||

@@ -70,14 +70,14 @@ function AppContent() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          
-          {/* Jobs Routes */}
-<Route path="/jobs" element={<JobsPage />} />
-<Route path="/jobs/:id" element={<JobDetailPage />} />
 
-{/* Users Routes - Keep for accessing user profiles */}
-<Route path="/users" element={<UsersPage />} />
-          
+          {/* Jobs Routes */}
+          <Route path="/jobs" element={<JobsPage />} />
+          <Route path="/jobs/:id" element={<JobDetailPage />} />
+
+          {/* Users Routes - Keep for accessing user profiles */}
+          <Route path="/users" element={<UsersPage />} />
+
           {/* Posts Routes */}
           <Route path="/posts" element={<PostsPage />} />
           <Route path="/posts/:id" element={<PostDetailPage />} />
@@ -90,16 +90,16 @@ function AppContent() {
             }
           />
 
- {/* Edit Post Route */}
-  <Route
-  path="/posts/:id/edit"
-  element={
-    <ProtectedRoute>
-      <CreatePostPage />
-    </ProtectedRoute>
-  }
-/>
-          
+          {/* Edit Post Route */}
+            <Route
+            path="/posts/:id/edit"
+            element={
+              <ProtectedRoute>
+                <CreatePostPage />
+              </ProtectedRoute>
+            }
+          />
+
           {/* Events Routes */}
           <Route path="/events" element={<EventsPage />} />
           <Route path="/events/:id" element={<EventDetailPage />} />
@@ -114,14 +114,14 @@ function AppContent() {
 
           {/* Edit Event Route */}
           <Route
-  path="/events/:id/edit"
-  element={
-    <ProtectedRoute>
-      <CreateEventPage />
-    </ProtectedRoute>
-  }
-/>
-          
+            path="/events/:id/edit"
+            element={
+              <ProtectedRoute>
+                <CreateEventPage />
+              </ProtectedRoute>
+            }
+          />
+
           {/* Profile Routes - IMPORTANT: /profile/edit must come BEFORE /profile/:id */}
           <Route
             path="/profile/edit"
@@ -133,24 +133,24 @@ function AppContent() {
           />
           <Route path="/profile/:id" element={<ProfilePage />} />
 
-{/* Chat Routes */}
+          {/* Chat Routes */}
+                    <Route
+            path="/chat"
+            element={
+              <ProtectedRoute>
+                <ChatPage />
+              </ProtectedRoute>
+            }
+          />
           <Route
-  path="/chat"
-  element={
-    <ProtectedRoute>
-      <ChatPage />
-    </ProtectedRoute>
-  }
-/>
-<Route
-  path="/chat/:userId"
-  element={
-    <ProtectedRoute>
-      <ChatPage />
-    </ProtectedRoute>
-  }
-/>
-          
+            path="/chat/:userId"
+            element={
+              <ProtectedRoute>
+                <ChatPage />
+              </ProtectedRoute>
+            }
+          />
+
           {/* Admin Routes */}
           <Route
             path="/admin"
@@ -160,7 +160,7 @@ function AppContent() {
               </AdminRoute>
             }
           />
-          
+
           {/* Fallback */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

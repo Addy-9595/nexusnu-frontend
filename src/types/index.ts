@@ -7,17 +7,7 @@ export const UserRole = {
 
 export type UserRole = typeof UserRole[keyof typeof UserRole];
 
-export interface User {
-  _id: string;
-  name: string;
-  email: string;
-  role: UserRole;
-  bio?: string;
-  major?: string;
-  department?: string;
-  profilePicture?: string;
-  skills?: string[];
-certifications?: Array<{
+export interface Certification {
   platform: string;
   certificate_name: string;
   issuer: string;
@@ -26,7 +16,20 @@ certifications?: Array<{
   credential_url: string;
   verified: boolean;
   notes?: string;
-}>;
+}
+
+export interface User {
+  _id: string;
+  name: string;
+  email: string;
+  role: UserRole;
+  bio?: string;
+  location?: string;
+  major?: string;
+  department?: string;
+  profilePicture?: string;
+  skills?: string[];
+  certifications?: Certification[];
   followers: string[];
   following: string[];
   isVerified: boolean;
