@@ -18,6 +18,10 @@ import EventDetailPage from './pages/event/EventDetailPage';
 import UsersPage from './pages/UsersPage';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import ChatPage from "./pages/chat/ChatPage";
+import JobsPage from './pages/JobsPage';
+import JobDetailPage from './pages/JobsDetailPage';
+
+
 // Protected Route Component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -67,8 +71,12 @@ function AppContent() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           
-          {/* Users Routes */}
-          <Route path="/users" element={<UsersPage />} />
+          {/* Jobs Routes */}
+<Route path="/jobs" element={<JobsPage />} />
+<Route path="/jobs/:id" element={<JobDetailPage />} />
+
+{/* Users Routes - Keep for accessing user profiles */}
+<Route path="/users" element={<UsersPage />} />
           
           {/* Posts Routes */}
           <Route path="/posts" element={<PostsPage />} />
