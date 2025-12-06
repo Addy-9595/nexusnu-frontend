@@ -41,6 +41,9 @@ const Home = () => {
   const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [searching, setSearching] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -87,6 +90,32 @@ const Home = () => {
 
     fetchData();
   }, []);
+
+  const handleUserSearch = async (query: string) => {
+    setSearchQuery(query);
+    if (!query.trim()) {
+      setSearchResults([]);
+      return;
+    }
+
+    setSearching(true);
+    try {
+      const response = await api.get('/users');
+      const allUsers = response.data.users;
+      const filtered = allUsers.filter((u: any) =>
+        u.name.toLowerCase().includes(query.toLowerCase()) ||
+        u.email.toLowerCase().includes(query.toLowerCase()) ||
+        u.major?.toLowerCase().includes(query.toLowerCase()) ||
+        u.department?.toLowerCase().includes(query.toLowerCase())
+      );
+      setSearchResults(filtered.slice(0, 5)); // Show top 5 results
+    } catch (error) {
+      console.error('User search error:', error);
+      setSearchResults([]);
+    } finally {
+      setSearching(false);
+    }
+  };
 
   return (
     <div className="min-h-screen">
@@ -152,6 +181,72 @@ const Home = () => {
               </div>
             ))}
           </div>
+        </div>
+      </div>
+
+      {/* User Search Section */}
+      <div className="bg-white py-12 border-t border-b border-gray-200">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
+          <div className="text-center mb-6">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+              🔍 Find Community Members
+            </h2>
+            <p className="text-gray-600">Search for students, professors, and alumni</p>
+          </div>
+
+          {/* Search Input */}
+          <div className="relative">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => handleUserSearch(e.target.value)}
+              placeholder="Search by name, email, major, or department..."
+              className="w-full px-6 py-4 text-lg border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-northeastern-red focus:border-transparent shadow-sm"
+            />
+            {searching && (
+              <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+                <div className="w-6 h-6 border-2 border-northeastern-red border-t-transparent rounded-full animate-spin"></div>
+              </div>
+            )}
+          </div>
+
+          {/* Search Results */}
+          {searchQuery && searchResults.length > 0 && (
+            <div className="mt-4 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden">
+              {searchResults.map((result) => (
+                <Link
+                  key={result._id}
+                  to={`/profile/${result._id}`}
+                  onClick={() => {
+                    setSearchQuery('');
+                    setSearchResults([]);
+                  }}
+                  className="flex items-center p-4 hover:bg-gray-50 border-b border-gray-100 last:border-b-0 transition"
+                >
+                  <div className="w-12 h-12 bg-northeastern-red rounded-full flex items-center justify-center text-white font-bold text-lg mr-4 flex-shrink-0">
+                    {result.name.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-gray-900">{result.name}</p>
+                    <p className="text-sm text-gray-600 truncate">{result.email}</p>
+                    {(result.major || result.department) && (
+                      <p className="text-xs text-gray-500">
+                        {result.major || result.department}
+                      </p>
+                    )}
+                  </div>
+                  <span className="ml-2 text-northeastern-red font-semibold">→</span>
+                </Link>
+              ))}
+            </div>
+          )}
+
+          {/* No Results */}
+          {searchQuery && !searching && searchResults.length === 0 && (
+            <div className="mt-4 bg-gray-50 border border-gray-200 rounded-xl p-6 text-center">
+              <p className="text-gray-600">No users found matching "{searchQuery}"</p>
+            </div>
+          )}
         </div>
       </div>
 
@@ -313,4 +408,5 @@ const Home = () => {
     </div>
   );
 };
+
 export default Home;
