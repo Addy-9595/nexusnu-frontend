@@ -211,18 +211,19 @@ const PostDetailPage = () => {
           <div className="text-gray-700 mb-6 whitespace-pre-wrap">{post.content}</div>
 
           {/* Tags */}
-          {post.tags && post.tags.length > 0 && (
-            <div className="flex flex-wrap gap-2 mb-6">
-              {post.tags.map((tag, index) => (
-                <span
-                  key={index}
-                  className="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm"
-                >
-                  #{tag}
-                </span>
-              ))}
-            </div>
-          )}
+{post.tags && post.tags.length > 0 && (
+  <div className="flex flex-wrap gap-2 mb-6">
+    {post.tags.map((tag, index) => (
+      <Link
+        key={index}
+        to={`/posts?tag=${encodeURIComponent(tag)}`}
+        className="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm hover:bg-northeastern-red hover:text-white transition-colors cursor-pointer"
+      >
+        #{tag}
+      </Link>
+    ))}
+  </div>
+)}
 
           {/* Like Button */}
           <div className="flex items-center space-x-4 pt-4 border-t">
@@ -317,6 +318,7 @@ const PostDetailPage = () => {
                         )}
                         <span className="text-xs text-gray-500 ml-auto">{new Date(comment.createdAt).toLocaleString()}</span>
                       </div>
+                      {/* Wrapper below to control comments overflow */}
                       <div className="break-words whitespace-pre-wrap overflow-wrap-anywhere">
                         <p className="text-gray-700">{comment.text}</p>
                       </div>
@@ -365,6 +367,7 @@ const PostDetailPage = () => {
                                   </span>
                                   <span className="text-xs text-gray-500 ml-auto">{new Date(reply.createdAt).toLocaleString()}</span>
                                 </div>
+                                {/* Wrapper below to control replies overflow */}
                                 <div className="break-words whitespace-pre-wrap overflow-wrap-anywhere">
                                   <p className="text-gray-800 text-sm">{reply.text}</p>
                                 </div>

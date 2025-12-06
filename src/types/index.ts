@@ -139,3 +139,47 @@ export interface Conversation {
   unreadCount: number;
   updatedAt: string;
 }
+
+export interface Job {
+  job_id: string;
+  employer_name: string;
+  employer_logo?: string;
+  employer_website?: string;
+  job_employment_type: string;
+  job_title: string;
+  job_apply_link: string;
+  job_description: string;
+  job_city?: string;
+  job_state?: string;
+  job_country: string;
+  job_posted_at_datetime_utc?: string;
+  job_posted_at_timestamp?: number;
+  job_is_remote: boolean;
+  job_salary?: string;
+  job_min_salary?: number;
+  job_max_salary?: number;
+  job_required_experience?: {
+    no_experience_required: boolean;
+    required_experience_in_months?: number;
+    experience_mentioned: boolean;
+    experience_preferred: boolean;
+  };
+  job_required_skills?: string[];
+  job_required_education?: {
+    postgraduate_degree: boolean;
+    professional_school: boolean;
+    high_school: boolean;
+    associates_degree: boolean;
+    bachelors_degree: boolean;
+    degree_mentioned: boolean;
+    degree_preferred: boolean;
+    professional_school_mentioned: boolean;
+  };
+}
+
+export interface JobSearchParams {
+  query: string;
+  location?: string;
+  employment_type?: string;
+  page?: number;
+}

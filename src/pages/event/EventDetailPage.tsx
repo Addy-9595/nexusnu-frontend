@@ -228,18 +228,19 @@ const EventDetailPage = () => {
             </div>
 
             {/* Tags */}
-            {event.tags && event.tags.length > 0 && (
-              <div className="flex flex-wrap gap-2 mb-6">
-                {event.tags.map((tag, index) => (
-                  <span
-                    key={index}
-                    className="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm"
-                  >
-                    #{tag}
-                  </span>
-                ))}
-              </div>
-            )}
+{event.tags && event.tags.length > 0 && (
+  <div className="flex flex-wrap gap-2 mb-6">
+    {event.tags.map((tag, index) => (
+      <Link
+        key={index}
+        to={`/events?tag=${encodeURIComponent(tag)}`}
+        className="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm hover:bg-northeastern-red hover:text-white transition-colors cursor-pointer"
+      >
+        #{tag}
+      </Link>
+    ))}
+  </div>
+)}
 
             {/* Join/Leave Button */}
             {isAuthenticated && !isOrganizer && !isPastEvent && (
