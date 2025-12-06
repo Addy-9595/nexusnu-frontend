@@ -40,10 +40,26 @@ const JobsPage = () => {
   };
 
   useEffect(() => {
-    // Load initial jobs on mount
-    if (searchQuery) {
+    // Load jobs from URL params on mount
+    const urlQuery = searchParams.get('q');
+    const urlLocation = searchParams.get('location');
+    const urlType = searchParams.get('type');
+    
+    // If URL has search params, restore state and trigger search
+    if (urlQuery || urlLocation || urlType) {
+      // State is already initialized from URL params in useState,
+      // but we double-check here to ensure sync
+      if (urlQuery && urlQuery !== searchQuery) setSearchQuery(urlQuery);
+      if (urlLocation && urlLocation !== location) setLocation(urlLocation);
+      if (urlType && urlType !== employmentType) setEmploymentType(urlType);
+      
+      // Small delay to ensure state is updated before search
+      setTimeout(() => handleSearch(), 0);
+    } else if (searchQuery) {
+      // No URL params, but have default query - do initial search
       handleSearch();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Only run once on mount
 
   const formatSalary = (job: Job) => {
