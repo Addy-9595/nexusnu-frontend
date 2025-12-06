@@ -50,7 +50,7 @@ export const userAPI = {
   uploadProfilePicture: (file: File) => {
     const formData = new FormData();
     formData.append('profilePicture', file);
-    
+
     return api.post<{ user: User; profilePicture: string }>('/users/profile/upload', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
@@ -107,13 +107,13 @@ export const eventAPI = {
 
 export const chatAPI = {
   getConversations: () => api.get<{ conversations: Conversation[] }>('/chat/conversations'),
-  getMessages: (conversationId: string, page?: number) => 
-    api.get<{ messages: Message[]; pagination: any }>(`/chat/${conversationId}?page=${page || 1}`),
-  sendMessage: (recipientId: string, content: string) => 
+  getMessages: (conversationId: string, page?: number) =>
+    api.get<{ messages: Message[]; pagination: { page: number; totalPages: number; total: number } }>(`/chat/${conversationId}?page=${page || 1}`),
+  sendMessage: (recipientId: string, content: string) =>
     api.post<{ message: string; data: Message }>('/chat/send', { recipientId, content }),
-  markAsRead: (messageId: string) => 
+  markAsRead: (messageId: string) =>
     api.put(`/chat/${messageId}/read`),
-  deleteMessage: (messageId: string) => 
+  deleteMessage: (messageId: string) =>
     api.delete(`/chat/${messageId}`),
 };
 
