@@ -318,6 +318,7 @@ const PostDetailPage = () => {
                         )}
                         <span className="text-xs text-gray-500 ml-auto">{new Date(comment.createdAt).toLocaleString()}</span>
                       </div>
+                      {/* Wrapper below to control comments overflow */}
                       <div className="break-words whitespace-pre-wrap overflow-wrap-anywhere">
                         <p className="text-gray-700">{comment.text}</p>
                       </div>
@@ -366,6 +367,7 @@ const PostDetailPage = () => {
                                   </span>
                                   <span className="text-xs text-gray-500 ml-auto">{new Date(reply.createdAt).toLocaleString()}</span>
                                 </div>
+                                {/* Wrapper below to control replies overflow */}
                                 <div className="break-words whitespace-pre-wrap overflow-wrap-anywhere">
                                   <p className="text-gray-800 text-sm">{reply.text}</p>
                                 </div>

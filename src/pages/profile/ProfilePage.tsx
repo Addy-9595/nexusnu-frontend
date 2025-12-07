@@ -110,7 +110,7 @@ const ProfilePage = () => {
                   user.name.charAt(0).toUpperCase()
                 )}
               </div>
-              
+
               <div>
                 <h1 className="text-3xl font-bold text-gray-800 mb-2">
                   {user.name}
@@ -169,6 +169,16 @@ const ProfilePage = () => {
 
           {user.bio && (
             <p className="mt-6 text-gray-700">{user.bio}</p>
+          )}
+
+          {isOwnProfile && user.location && (
+            <>
+            <br />
+              <span>Lives in</span>
+              <span className="inline-block px-2 py-1 rounded text-sm">
+                {user.location}
+              </span>
+            </>
           )}
 
           {user.skills && user.skills.length > 0 && (

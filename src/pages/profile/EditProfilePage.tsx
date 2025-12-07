@@ -5,6 +5,7 @@ import { userAPI } from '../../services/api';
 import Cropper, { type Point, type Area } from 'react-easy-crop';
 import SkillsAutocomplete from '../../components/user/SkillsAutocomplete';
 import CertificationFetch from '../../components/user/CertificationFetch';
+import type { Certification } from '../../types';
 
 const EditProfilePage = () => {
   const navigate = useNavigate();
@@ -15,14 +16,15 @@ const EditProfilePage = () => {
   const [formData, setFormData] = useState({
   name: '',
   bio: '',
+  location: '',
   major: '',
   department: '',
   skills: [] as string[],
-  certifications: [] as any[],
+  certifications: [] as Certification[],
 });
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewImage, setPreviewImage] = useState<string>('');
-  
+
   // Cropper state
   const [crop, setCrop] = useState<Point>({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
@@ -37,12 +39,13 @@ const EditProfilePage = () => {
       setFormData({
         name: user.name || '',
         bio: user.bio || '',
+        location: user.location || '',
         major: user.major || '',
         department: user.department || '',
         skills: user.skills || [],
         certifications: user.certifications || [],
       });
-      
+
       if (user.profilePicture) {
         if (user.profilePicture.startsWith('http')) {
           setPreviewImage(user.profilePicture);
@@ -69,13 +72,13 @@ const EditProfilePage = () => {
     const image = new Image();
     image.src = imageSrc;
     await new Promise((resolve) => { image.onload = resolve; });
-    
+
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d')!;
-    
+
     canvas.width = pixelCrop.width;
     canvas.height = pixelCrop.height;
-    
+
     ctx.drawImage(
       image,
       pixelCrop.x,
@@ -87,7 +90,7 @@ const EditProfilePage = () => {
       pixelCrop.width,
       pixelCrop.height
     );
-    
+
     return new Promise((resolve) => {
       canvas.toBlob((blob) => resolve(blob!), 'image/jpeg', 0.95);
     });
@@ -95,10 +98,10 @@ const EditProfilePage = () => {
 
   const handleCropSave = async () => {
     if (!croppedAreaPixels || !imageToCrop) return;
-    
+
     const croppedBlob = await getCroppedImage(imageToCrop, croppedAreaPixels);
     const croppedFile = new File([croppedBlob], 'profile.jpg', { type: 'image/jpeg' });
-    
+
     setSelectedFile(croppedFile);
     setPreviewImage(URL.createObjectURL(croppedBlob));
     setShowCropper(false);
@@ -111,7 +114,7 @@ const EditProfilePage = () => {
         setError('Please select an image file');
         return;
       }
-      
+
       if (file.size > 5 * 1024 * 1024) {
         setError('Image size must be less than 5MB');
         return;
@@ -132,19 +135,18 @@ const EditProfilePage = () => {
     setError('');
 
     try {
-  if (selectedFile) {
-    setUploading(true);
-    await userAPI.uploadProfilePicture(selectedFile);
-    setUploading(false);
-  }
+      if (selectedFile) {
+        setUploading(true);
+        await userAPI.uploadProfilePicture(selectedFile);
+        setUploading(false);
+      }
+      console.log('💾 Saving profile with certs:', formData.certifications);
+      await userAPI.updateProfile(formData);
 
-  console.log('💾 Saving profile with certs:', formData.certifications);
-  await userAPI.updateProfile(formData);
-      
       if (refreshUser) {
         await refreshUser();
       }
-      
+
       navigate(`/profile/${user?._id}`);
     } catch (err: any) {
       console.error('Update profile error:', err);
@@ -284,6 +286,20 @@ const EditProfilePage = () => {
                 rows={4}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-northeastern-red"
                 placeholder="Tell us about yourself..."
+              />
+            </div>
+
+            <div>
+              <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">
+                Location
+              </label>
+              <input
+                type="text"
+                id="location"
+                name="location"
+                value={formData.location}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-northeastern-red"
               />
             </div>
 
