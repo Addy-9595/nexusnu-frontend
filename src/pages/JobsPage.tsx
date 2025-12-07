@@ -5,7 +5,12 @@ import type { Job } from '../types';
 
 const JobsPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [jobs, setJobs] = useState<Job[]>([]);
+  
+  // Initialize state from sessionStorage or URL params
+  const [jobs, setJobs] = useState<Job[]>(() => {
+    const cached = sessionStorage.getItem('cachedJobs');
+    return cached ? JSON.parse(cached) : [];
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || 'software engineer');
@@ -30,37 +35,24 @@ const JobsPage = () => {
       setSearchParams(newSearchParams);
 
       const response = await searchJobs(params);
-      setJobs(response.data || []);
+      const fetchedJobs = response.data || [];
+      setJobs(fetchedJobs);
+      
+      // Cache jobs in sessionStorage
+      sessionStorage.setItem('cachedJobs', JSON.stringify(fetchedJobs));
     } catch (err: any) {
       setError(err.message || 'Failed to search jobs');
       setJobs([]);
+      sessionStorage.removeItem('cachedJobs');
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    // Load jobs from URL params on mount
-    const urlQuery = searchParams.get('q');
-    const urlLocation = searchParams.get('location');
-    const urlType = searchParams.get('type');
-    
-    // If URL has search params, restore state and trigger search
-    if (urlQuery || urlLocation || urlType) {
-      // State is already initialized from URL params in useState,
-      // but we double-check here to ensure sync
-      if (urlQuery && urlQuery !== searchQuery) setSearchQuery(urlQuery);
-      if (urlLocation && urlLocation !== location) setLocation(urlLocation);
-      if (urlType && urlType !== employmentType) setEmploymentType(urlType);
-      
-      // Small delay to ensure state is updated before search
-      setTimeout(() => handleSearch(), 0);
-    } else if (searchQuery) {
-      // No URL params, but have default query - do initial search
-      handleSearch();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Only run once on mount
+    // Don't auto-search on mount - jobs are already loaded from sessionStorage
+    // User must click search or reload a URL with params
+  }, []);
 
   const formatSalary = (job: Job) => {
     if (job.job_min_salary && job.job_max_salary) {
@@ -178,7 +170,7 @@ const JobsPage = () => {
         {!loading && jobs.length === 0 && !error && (
           <div className="bg-white rounded-lg shadow-md p-12 text-center">
             <div className="text-6xl mb-4">📭</div>
-            <p className="text-gray-500 mb-4">No jobs found. Try different keywords or location.</p>
+            <p className="text-gray-500 mb-4">No jobs found. Try searching with different keywords.</p>
           </div>
         )}
 
@@ -222,8 +214,8 @@ const JobsPage = () => {
                     <span className="mr-2">📍</span>
                     <span className="line-clamp-1">
                       {job.job_is_remote
-  ? 'Remote'
-  : [job.job_city, job.job_state, job.job_country].filter(Boolean).join(', ') || 'Location not specified'}
+                        ? 'Remote'
+                        : [job.job_city, job.job_state, job.job_country].filter(Boolean).join(', ') || 'Location not specified'}
                     </span>
                   </div>
                   <div className="flex items-center">

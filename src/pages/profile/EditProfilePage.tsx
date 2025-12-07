@@ -348,6 +348,7 @@ const EditProfilePage = () => {
     onChange={(skills) => setFormData(prev => ({ ...prev, skills }))}
   />
 </div>
+<br />
 {/* Certifications Section */}
 <CertificationFetch
   certifications={formData.certifications}
