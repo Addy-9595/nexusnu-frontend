@@ -222,8 +222,8 @@ const JobsPage = () => {
                     <span className="mr-2">📍</span>
                     <span className="line-clamp-1">
                       {job.job_is_remote
-                        ? 'Remote'
-                        : `${job.job_city || ''}${job.job_city && job.job_state ? ', ' : ''}${job.job_state || job.job_country}`}
+  ? 'Remote'
+  : [job.job_city, job.job_state, job.job_country].filter(Boolean).join(', ') || 'Location not specified'}
                     </span>
                   </div>
                   <div className="flex items-center">

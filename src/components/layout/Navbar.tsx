@@ -113,7 +113,7 @@ const Navbar = () => {
             >
               Community
             </Link>
-              {isAuthenticated && user ? (
+            {isAuthenticated && user ? (
               <>
                 <Link
                   to="/jobs"
@@ -121,32 +121,6 @@ const Navbar = () => {
                 >
                   Jobs
                 </Link>
-                <Link
-                  to="/chat"
-                <Link 
-                  to="/posts" 
-                  className="text-base font-semibold hover:text-gray-200 transition-colors relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 hover:after:w-full after:bg-white after:transition-all after:duration-300"
-                >
-                  Posts
-                </Link>
-                <Link 
-  to="/events" 
-  className="text-base font-semibold hover:text-gray-200 transition-colors relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 hover:after:w-full after:bg-white after:transition-all after:duration-300"
->
-  Events
-</Link>
-<Link 
-  to="/jobs" 
-  className="text-base font-semibold hover:text-gray-200 transition-colors relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 hover:after:w-full after:bg-white after:transition-all after:duration-300"
->
-  Jobs
-</Link>
-<Link 
-  to="/users" 
-  className="text-base font-semibold hover:text-gray-200 transition-colors relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 hover:after:w-full after:bg-white after:transition-all after:duration-300"
->
-  Community
-</Link>
                 <Link 
                   to="/chat" 
                   className="relative text-base font-semibold hover:text-gray-200 transition-colors after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 hover:after:w-full after:bg-white after:transition-all after:duration-300"
@@ -262,26 +236,26 @@ const Navbar = () => {
                   Posts
                 </Link>
                 <Link
-  to="/events"
-  onClick={closeMobileMenu}
-  className="text-white text-xl font-semibold py-3 px-4 rounded-lg hover:bg-white/10 transition-colors"
->
-  Events
-</Link>
-<Link
-  to="/jobs"
-  onClick={closeMobileMenu}
-  className="text-white text-xl font-semibold py-3 px-4 rounded-lg hover:bg-white/10 transition-colors"
->
-  Jobs
-</Link>
-<Link
-  to="/users"
-  onClick={closeMobileMenu}
-  className="text-white text-xl font-semibold py-3 px-4 rounded-lg hover:bg-white/10 transition-colors"
->
-  Community
-</Link>
+                  to="/events"
+                  onClick={closeMobileMenu}
+                  className="text-white text-xl font-semibold py-3 px-4 rounded-lg hover:bg-white/10 transition-colors"
+                >
+                  Events
+                </Link>
+                <Link
+                  to="/jobs"
+                  onClick={closeMobileMenu}
+                  className="text-white text-xl font-semibold py-3 px-4 rounded-lg hover:bg-white/10 transition-colors"
+                >
+                  Jobs
+                </Link>
+                <Link
+                  to="/users"
+                  onClick={closeMobileMenu}
+                  className="text-white text-xl font-semibold py-3 px-4 rounded-lg hover:bg-white/10 transition-colors"
+                >
+                  Community
+                </Link>
                 <Link
                   to="/chat"
                   onClick={closeMobileMenu}
