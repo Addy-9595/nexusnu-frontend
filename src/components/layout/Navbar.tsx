@@ -123,6 +123,32 @@ const Navbar = () => {
                 </Link>
                 <Link
                   to="/chat"
+                <Link 
+                  to="/posts" 
+                  className="text-base font-semibold hover:text-gray-200 transition-colors relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 hover:after:w-full after:bg-white after:transition-all after:duration-300"
+                >
+                  Posts
+                </Link>
+                <Link 
+  to="/events" 
+  className="text-base font-semibold hover:text-gray-200 transition-colors relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 hover:after:w-full after:bg-white after:transition-all after:duration-300"
+>
+  Events
+</Link>
+<Link 
+  to="/jobs" 
+  className="text-base font-semibold hover:text-gray-200 transition-colors relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 hover:after:w-full after:bg-white after:transition-all after:duration-300"
+>
+  Jobs
+</Link>
+<Link 
+  to="/users" 
+  className="text-base font-semibold hover:text-gray-200 transition-colors relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 hover:after:w-full after:bg-white after:transition-all after:duration-300"
+>
+  Community
+</Link>
+                <Link 
+                  to="/chat" 
                   className="relative text-base font-semibold hover:text-gray-200 transition-colors after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 hover:after:w-full after:bg-white after:transition-all after:duration-300"
                 >
                   Messages

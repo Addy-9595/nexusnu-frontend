@@ -78,6 +78,14 @@ function AppContent() {
           {/* Users Routes - Keep for accessing user profiles */}
           <Route path="/users" element={<UsersPage />} />
 
+          
+          {/* Jobs Routes */}
+<Route path="/jobs" element={<JobsPage />} />
+<Route path="/jobs/:id" element={<JobDetailPage />} />
+
+{/* Users Routes - Keep for accessing user profiles */}
+<Route path="/users" element={<UsersPage />} />
+          
           {/* Posts Routes */}
           <Route path="/posts" element={<PostsPage />} />
           <Route path="/posts/:id" element={<PostDetailPage />} />

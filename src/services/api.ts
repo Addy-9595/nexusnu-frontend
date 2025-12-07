@@ -117,4 +117,11 @@ export const chatAPI = {
     api.delete(`/chat/${messageId}`),
 };
 
+export const jobCommentAPI = {
+  getByJob: (jobId: string) => api.get<{ comments: any[] }>(`/job-comments/${jobId}`),
+  add: (jobId: string, text: string, rating?: number) => 
+    api.post(`/job-comments/${jobId}`, { text, rating }),
+  delete: (commentId: string) => api.delete(`/job-comments/${commentId}`),
+};
+
 export default api;
