@@ -24,6 +24,8 @@ const Footer = () => {
               <li><a href="/posts" className="hover:text-white transition-colors">Posts</a></li>
               <li><a href="/events" className="hover:text-white transition-colors">Events</a></li>
               <li><a href="/users" className="hover:text-white transition-colors">Users</a></li>
+              <li><a href="https://github.com/Addy-9595/nexusnu-frontend" target="_blank" className="hover:text-white transition-colors">Frontend Github</a></li>
+              <li><a href="https://github.com/Addy-9595/nexusnu-backend#" target="_blank" className="hover:text-white transition-colors">Backend Github</a></li>
             </ul>
           </div>
 
